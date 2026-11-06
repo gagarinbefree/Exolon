@@ -4,7 +4,7 @@ A work-in-progress C# port for Godot 4 .NET, based on the [melonJS Exolon projec
 
 ## Running the game
 
-Open `project.godot` in Godot 4.7.2 .NET, build the C# project with the .NET 10 SDK, and run the main scene. Use the left and right arrows to move, up to jump or use a teleport, down to crouch, and Space to shoot. Hold Space to fire a grenade.
+Open `project.godot` in Godot 4.7.2 .NET, build the C# project with the .NET 10 SDK, and run the main scene. Press Space on the title screen to start. Use the left and right arrows to move, up to jump or use a teleport, down to crouch, and Space to shoot. Hold Space to fire a grenade.
 
 All 75 zones are enabled and available as editor previews. Gameplay has been checked with automated scenarios and comparisons against the melonJS version; a complete manual playthrough and further fidelity checks are still needed.
 
@@ -25,7 +25,7 @@ Open `http://127.0.0.1:18765/` in a WebGL 2-compatible browser. GitHub Actions b
 ## Project layout
 
 - `assets/images`, `assets/maps`, `assets/sound`: graphics, original TMX maps, and audio.
-- `scenes/screens`: shared game screens; `first_screen.tscn` is the gameplay scene.
+- `scenes/screens`: shared game screens; `title_screen.tscn` starts the game and `first_screen.tscn` contains gameplay.
 - `scenes/zones`: one preview scene for each map.
 - `scripts/screens`: map loading and shared screen logic.
 - `scripts/entities`: player and game entities implemented in C#.

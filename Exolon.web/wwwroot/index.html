@@ -75,7 +75,7 @@
         #status {
             position: absolute;
             inset: 0;
-            background-color: #242424;
+            background-color: #000;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -84,27 +84,9 @@
         }
 
         #status-splash {
-            width: clamp(96px, 22vmin, 200px);
+            width: min(80vw, 512px);
             height: auto;
-            animation: status-splash-pulse 2.4s ease-in-out infinite;
-        }
-
-        @keyframes status-splash-pulse {
-
-            0%,
-            100% {
-                opacity: 1;
-            }
-
-            50% {
-                opacity: .55;
-            }
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-            #status-splash {
-                animation: none;
-            }
+            image-rendering: pixelated;
         }
 
         #status-bar {
@@ -174,8 +156,7 @@
     </noscript>
 
     <div id="status">
-        <!-- Set src to splash.svg, splash.png, or splash.webp to choose the image format. -->
-        <img id="status-splash" src="splash.svg" alt="Loading">
+        <img id="status-splash" src="splash.png" alt="Exolon — loading">
         <div id="status-bar"><progress id="status-progress" aria-label="Loading progress"></progress></div>
         <div id="status-notice" role="alert"></div>
     </div>

@@ -38,7 +38,7 @@ jobs:
         if: always()
         with:
           name: browser-smoke
-          path: artifacts/web-smoke.png
+          path: artifacts/*.png
           if-no-files-found: ignore
       - uses: actions/upload-pages-artifact@v3
         if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'

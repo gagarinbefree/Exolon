@@ -81,6 +81,7 @@ public partial class FirstScreen : Node2D
 	private int _ammo = 99, _grenades = 10, _lives = 9, _points;
 	private float _fireHeld, _deathTime;
 	private bool _fireWasPressed;
+	private bool _awaitFireRelease;
 	private bool _gameOver;
 	private float _gameOverTime;
 	private int _zone;
@@ -193,6 +194,7 @@ public partial class FirstScreen : Node2D
 		AddChild(new MapObjectView { Name = "ExplosionParticles", ZIndex = 3800, DrawObject = target => DrawEffects(target, "explosion_particle") });
 		AddChild(new MapObjectView { Name = "HUD", ZIndex = 3900, DrawObject = DrawHud });
 		_zone = InitialZoneCount;
+		_awaitFireRelease = Input.IsActionPressed("fire");
 		LoadMap(InitialLevel);
 		if (Engine.IsEditorHint()) { QueueRedraw(); return; }
 		_player.CanLeaveScreen = LevelMap.Exists(_nextLevel) && LevelMap.CanEnter(_nextLevel);
@@ -530,6 +532,11 @@ public partial class FirstScreen : Node2D
 	private void HandleFire(float dt)
 	{
 		bool pressed = Input.IsActionPressed("fire");
+		if (_awaitFireRelease)
+		{
+			if (!pressed) _awaitFireRelease = false;
+			return;
+		}
 		if (!pressed) { _fireHeld = 0; _fireWasPressed = false; return; }
 		Vector2 topLeft = _player.Position - new Vector2(24, 32);
 		float duckOffset = _player.IsDucking ? 10 : 0;

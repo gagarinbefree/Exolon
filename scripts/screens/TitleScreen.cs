@@ -2,12 +2,19 @@ using Godot;
 
 public partial class TitleScreen : Node2D
 {
+	private AudioStreamPlayer _audio = null!;
+
 	public override void _Ready()
 	{
-		var audio = new AudioStreamPlayer { Stream = GD.Load<AudioStream>("res://assets/sound/theme.ogg") };
-		AddChild(audio);
-		audio.Play();
+		_audio = new AudioStreamPlayer { Stream = GD.Load<AudioStream>("res://assets/sound/theme.ogg") };
+		AddChild(_audio);
+		_audio.Play();
 		QueueRedraw();
+	}
+
+	public override void _ExitTree()
+	{
+		if (IsInstanceValid(_audio)) { _audio.Stop(); _audio.Stream = null; }
 	}
 
 	public override void _Process(double delta)
