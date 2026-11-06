@@ -18,7 +18,7 @@ const fs = require('node:fs');
     console.log(`[browser:${message.type()}] ${text}`);
   });
   try {
-    await page.goto('http://127.0.0.1:8765/', { waitUntil: 'domcontentloaded' });
+    await page.goto(process.env.EXOLON_WEB_URL || 'http://127.0.0.1:8765/', { waitUntil: 'domcontentloaded' });
     const deadline = Date.now() + 120000;
     while (!started && Date.now() < deadline && errors.length === 0) await page.waitForTimeout(500);
     if (!started) throw new Error('The C# game did not reach its startup message');

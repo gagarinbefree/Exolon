@@ -10,3 +10,5 @@ obj/
 
 # Generated browser bundle
 Exolon.web/AppBundle/
+artifacts/
+*.csproj.old
