@@ -1,0 +1,12 @@
+<Solution>
+  <Configurations>
+    <BuildType Name="Debug" />
+    <BuildType Name="Editor" />
+    <BuildType Name="Release" />
+  </Configurations>
+  <Project Path="Exolon.csproj" />
+  <Project Path="Exolon.web/Exolon.web.csproj">
+    <BuildType Solution="Editor|*" Project="Debug" />
+    <Build Project="false" />
+  </Project>
+</Solution>

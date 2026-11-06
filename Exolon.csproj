@@ -1,8 +1,19 @@
 <Project Sdk="Godot.NET.Sdk/4.7.2">
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <TargetFramework Condition=" '$(GodotTargetPlatform)' == 'android' ">net9.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
+    <TargetFramework Condition=" '$(GodotTargetPlatform)' == 'android' ">net10.0</TargetFramework>
     <EnableDynamicLoading>true</EnableDynamicLoading>
     <Nullable>enable</Nullable>
   </PropertyGroup>
+    <ItemGroup>
+        <PackageReference Include="2dog.godotsharp" Version="$(TwoDogVersion)" />
+    </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="2dog.godotsharp.editor" Version="$(TwoDogVersion)" Condition="'$(Configuration)' == 'Debug' Or '$(Configuration)' == 'Editor'" />
+    </ItemGroup>
+    <!-- added by the 2dog tool: properties 2dog hosts need that were not already set -->
+    <PropertyGroup>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <DefaultItemExcludes>$(DefaultItemExcludes);Exolon.web/**</DefaultItemExcludes>
+    </PropertyGroup>
 </Project>
