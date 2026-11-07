@@ -20,7 +20,6 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     env:
-      GODOT_ANDROID_KEYSTORE_RELEASE_PATH: ${{ runner.temp }}/exolon-release.keystore
       GODOT_ANDROID_KEYSTORE_RELEASE_USER: ${{ secrets.ANDROID_KEY_ALIAS }}
       GODOT_ANDROID_KEYSTORE_RELEASE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
       ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
@@ -44,7 +43,9 @@ jobs:
             echo 'Configure ANDROID_KEYSTORE_BASE64, ANDROID_KEY_ALIAS and ANDROID_KEYSTORE_PASSWORD repository secrets.' >&2
             exit 1
           fi
-          printf '%s' "$ANDROID_KEYSTORE_BASE64" | base64 --decode > "$GODOT_ANDROID_KEYSTORE_RELEASE_PATH"
+          SIGNING_PATH="$RUNNER_TEMP/exolon-release.keystore"
+          printf '%s' "$ANDROID_KEYSTORE_BASE64" | base64 --decode > "$SIGNING_PATH"
+          echo "GODOT_ANDROID_KEYSTORE_RELEASE_PATH=$SIGNING_PATH" >> "$GITHUB_ENV"
       - name: Set version
         shell: bash
         env:
