@@ -1,5 +1,10 @@
 # Exolon for Godot
 
+[![Test and deploy](https://github.com/gagarinbefree/Exolon/actions/workflows/web.yml/badge.svg)](https://github.com/gagarinbefree/Exolon/actions/workflows/web.yml)
+[![Tests](https://img.shields.io/github/check-runs/gagarinbefree/Exolon/main?nameFilter=Test%20Godot%20gameplay&label=tests)](https://github.com/gagarinbefree/Exolon/actions/workflows/web.yml)
+[![Latest release](https://img.shields.io/github/v/release/gagarinbefree/Exolon)](https://github.com/gagarinbefree/Exolon/releases/latest)
+[![Play in browser](https://img.shields.io/badge/play-in%20browser-blue)](https://gagarinbefree.github.io/Exolon/)
+
 A work-in-progress C# port for Godot 4 .NET, based on the [melonJS Exolon project](https://github.com/newagebegins/exolon). The original game's assets and maps are used for comparison and attribution; see [LICENSE.melonjs](LICENSE.melonjs) for the upstream license.
 
 ## Running the game
@@ -28,7 +33,7 @@ Open `http://127.0.0.1:18765/` in a WebGL 2-compatible browser. GitHub Actions b
 
 ## Android
 
-The Android app has its own touch controls; the web controls and desktop keyboard controls remain independent. The [Android workflow](../../actions/workflows/android.yml) creates a signed release APK and publishes the version as the `io.github.gagarinbefree:exolon-android` Maven package in GitHub Packages. Run it manually with an `X.Y.Z` version, or push a matching `vX.Y.Z` tag. The APK is also available as a workflow artifact. GitHub's Maven registry requires authentication even for public packages.
+The Android app has its own touch controls; the web controls and desktop keyboard controls remain independent. The [test and deploy workflow](../../actions/workflows/web.yml) builds a signed release APK for every successful push to `main`, using version `0.1.<run number>`. It publishes the APK as both a GitHub Release and the `io.github.gagarinbefree:exolon-android` Maven package in GitHub Packages; it is also available as a workflow artifact. GitHub's Maven registry requires authentication even for public packages.
 
 The workflow requires repository secrets `ANDROID_KEYSTORE_BASE64`, `ANDROID_KEY_ALIAS`, and `ANDROID_KEYSTORE_PASSWORD`. Keep a secure backup of the original release keystore and password: Android requires the same signing key for app updates. Android uses the official Godot 4.7.2 .NET 9 export template; the browser build continues to use .NET 10 and 2dog. Before an Android export, run `python tools/get_android_template.py .godot/android_release.apk` and `python tools/prepare_android_project.py`. The latter restores the Android target override, which the 2dog importer removes when building for the web.
 

@@ -10,7 +10,7 @@ if not match:
 major, minor, patch = map(int, match.groups())
 if minor > 999 or patch > 999 or major > 2099:
     raise SystemExit("Android version exceeds the supported version-code range")
-code = major * 1_000_000 + minor * 1_000 + patch
+code = int(sys.argv[2]) if len(sys.argv) > 2 else major * 1_000_000 + minor * 1_000 + patch
 if code < 1 or code > 2_100_000_000:
     raise SystemExit("Android version code must be between 1 and 2100000000")
 path = pathlib.Path("export_presets.cfg")

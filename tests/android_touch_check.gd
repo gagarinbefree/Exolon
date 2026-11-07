@@ -51,9 +51,10 @@ func run_check() -> void:
 		push_error("Fire remained pressed")
 		quit(1)
 		return
-	await RenderingServer.frame_post_draw
-	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path("res://artifacts"))
-	var orientation := "landscape" if size.x > size.y else "portrait"
-	root.get_texture().get_image().save_png("res://artifacts/android-touch-" + orientation + ".png")
+	if DisplayServer.get_name() != "headless":
+		await RenderingServer.frame_post_draw
+		DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path("res://artifacts"))
+		var orientation := "landscape" if size.x > size.y else "portrait"
+		root.get_texture().get_image().save_png("res://artifacts/android-touch-" + orientation + ".png")
 	print("PASS: Android-only diagonal and fire support independent simultaneous touches")
 	quit(0)

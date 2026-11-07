@@ -1,7 +1,8 @@
-name: Build and deploy web game
+name: Test and deploy
 
 on:
   push:
+    branches: [main]
   pull_request:
     branches: [main]
   workflow_dispatch:
@@ -14,7 +15,39 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  godot-tests:
+    name: Test Godot gameplay
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 10.0.x
+      - name: Download Godot .NET
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/godot"
+          gh release download 4.7.2-stable --repo godotengine/godot-builds --pattern 'Godot_v4.7.2-stable_mono_linux_x86_64.zip' --dir "$RUNNER_TEMP/godot"
+          unzip -q "$RUNNER_TEMP/godot/Godot_v4.7.2-stable_mono_linux_x86_64.zip" -d "$RUNNER_TEMP/godot"
+          GODOT="$(find "$RUNNER_TEMP/godot" -type f -name 'Godot*linux.x86_64' -print -quit)"
+          test -n "$GODOT"
+          chmod +x "$GODOT"
+          echo "GODOT=$GODOT" >> "$GITHUB_ENV"
+      - name: Compile and import the test project
+        run: |
+          dotnet build Exolon.csproj --configuration Debug
+          "$GODOT" --headless --path . --editor --import
+      - name: Test movement, collisions and Android touch input
+        run: |
+          "$GODOT" --headless --path . --script res://tests/first_screen_audit.gd
+          "$GODOT" --headless --path . --script res://tests/crouch_collision_check.gd
+          "$GODOT" --headless --path . --resolution 844x390 --script res://tests/android_touch_check.gd
+
   build-and-test:
+    name: Build and test browser game
+    needs: godot-tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -63,3 +96,98 @@ jobs:
     steps:
       - id: deployment
         uses: actions/deploy-pages@v5
+
+  android:
+    name: Android APK
+    needs: build-and-test
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    permissions:
+      contents: write
+      packages: write
+    env:
+      GODOT_ANDROID_KEYSTORE_RELEASE_USER: ${{ secrets.ANDROID_KEY_ALIAS }}
+      GODOT_ANDROID_KEYSTORE_RELEASE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+      ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: |
+            9.0.x
+            10.0.x
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '17'
+          server-id: github
+      - name: Prepare Android signing
+        shell: bash
+        run: |
+          if [ -z "$ANDROID_KEYSTORE_BASE64" ] || [ -z "$GODOT_ANDROID_KEYSTORE_RELEASE_USER" ] || [ -z "$GODOT_ANDROID_KEYSTORE_RELEASE_PASSWORD" ]; then
+            echo 'Configure ANDROID_KEYSTORE_BASE64, ANDROID_KEY_ALIAS and ANDROID_KEYSTORE_PASSWORD repository secrets.' >&2
+            exit 1
+          fi
+          SIGNING_PATH="$RUNNER_TEMP/exolon-release.keystore"
+          printf '%s' "$ANDROID_KEYSTORE_BASE64" | base64 --decode > "$SIGNING_PATH"
+          echo "GODOT_ANDROID_KEYSTORE_RELEASE_PATH=$SIGNING_PATH" >> "$GITHUB_ENV"
+      - name: Set release version
+        run: |
+          VERSION="0.1.${GITHUB_RUN_NUMBER}"
+          VERSION_CODE="$((1000 + GITHUB_RUN_NUMBER))"
+          python tools/set_android_version.py "$VERSION" "$VERSION_CODE"
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+          echo "VERSION_CODE=$VERSION_CODE" >> "$GITHUB_ENV"
+      - name: Install Android SDK components
+        run: |
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses >/dev/null || true
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" 'platform-tools' 'platforms;android-36' 'build-tools;36.0.0'
+      - name: Download Godot .NET and Android template
+        run: |
+          mkdir -p "$RUNNER_TEMP/godot" .godot
+          gh release download 4.7.2-stable --repo godotengine/godot-builds --pattern 'Godot_v4.7.2-stable_mono_linux_x86_64.zip' --dir "$RUNNER_TEMP/godot"
+          unzip -q "$RUNNER_TEMP/godot/Godot_v4.7.2-stable_mono_linux_x86_64.zip" -d "$RUNNER_TEMP/godot"
+          GODOT="$(find "$RUNNER_TEMP/godot" -type f -name 'Godot*linux.x86_64' -print -quit)"
+          test -n "$GODOT"
+          chmod +x "$GODOT"
+          echo "GODOT=$GODOT" >> "$GITHUB_ENV"
+          python tools/get_android_template.py .godot/android_release.apk
+      - name: Configure Godot Android SDK paths
+        run: |
+          mkdir -p "$HOME/.config/godot"
+          printf '[gd_resource type="EditorSettings" format=3]\n\n[resource]\nexport/android/java_sdk_path = "%s"\nexport/android/android_sdk_path = "%s"\n' "$JAVA_HOME" "$ANDROID_HOME" > "$HOME/.config/godot/editor_settings-4.7.tres"
+      - name: Build signed Android release
+        run: |
+          dotnet build Exolon.csproj --configuration Debug
+          "$GODOT" --headless --path . --editor --import
+          python tools/prepare_android_project.py
+          mkdir -p build/android
+          "$GODOT" --headless --path . --export-release Android "build/android/Exolon-${VERSION}.apk"
+      - name: Verify signed APK and version
+        run: |
+          APK="build/android/Exolon-${VERSION}.apk"
+          "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose "$APK"
+          "$ANDROID_HOME/build-tools/36.0.0/aapt" dump badging "$APK" | grep -F "versionCode='${VERSION_CODE}' versionName='${VERSION}'"
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Exolon-Android-${{ env.VERSION }}
+          path: build/android/*.apk
+          if-no-files-found: error
+      - name: Publish version to GitHub Packages
+        run: |
+          mvn --batch-mode org.apache.maven.plugins:maven-deploy-plugin:3.1.4:deploy-file \
+            -Dfile="build/android/Exolon-${VERSION}.apk" \
+            -DgroupId=io.github.gagarinbefree -DartifactId=exolon-android \
+            -Dversion="$VERSION" -Dpackaging=apk -DgeneratePom=true \
+            -DrepositoryId=github -Durl="https://maven.pkg.github.com/${GITHUB_REPOSITORY}"
+      - name: Publish GitHub Release
+        run: |
+          APK="build/android/Exolon-${VERSION}.apk"
+          TAG="v${VERSION}"
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" "$APK" --clobber
+          else
+            gh release create "$TAG" "$APK" --target "$GITHUB_SHA" --title "Exolon ${VERSION}" --generate-notes --latest
+          fi
