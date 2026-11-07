@@ -2,6 +2,7 @@ extends SceneTree
 
 # Test driver only: gameplay remains in C#. Inputs go through Godot's InputMap.
 var status_label: Label
+var scenario_failed := false
 
 func _initialize():
 	root.title = "EXOLON - AUTOMATIC DEMONSTRATION"
@@ -13,10 +14,15 @@ func wait_physics(frames: int):
 		await physics_frame
 
 func fail(message: String):
+	scenario_failed = true
 	push_error(message)
 	quit(1)
 
 func run_scenario():
+	if "--ci" in OS.get_cmdline_user_args():
+		await run_round()
+		if not scenario_failed: quit(0)
+		return
 	while true:
 		await run_round()
 

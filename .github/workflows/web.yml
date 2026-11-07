@@ -39,11 +39,9 @@ jobs:
         run: |
           dotnet build Exolon.csproj --configuration Debug
           "$GODOT" --headless --path . --editor --import
-      - name: Test movement, collisions and Android touch input
-        run: |
-          "$GODOT" --headless --path . --script res://tests/first_screen_audit.gd
-          "$GODOT" --headless --path . --script res://tests/crouch_collision_check.gd
-          "$GODOT" --headless --path . --resolution 844x390 --script res://tests/android_touch_check.gd
+      - name: Test all gameplay scenarios
+        timeout-minutes: 8
+        run: python tools/run_godot_tests.py --godot "$GODOT" --group logic --workers 3 --timeout 120
 
   build-and-test:
     name: Build and test browser game

@@ -15,6 +15,8 @@ On a touchscreen, use the control areas shown in [the control diagram](docs/virt
 
 All 75 zones are enabled and available as editor previews. Gameplay has been checked with automated scenarios and comparisons against the melonJS version; a complete manual playthrough and further fidelity checks are still needed.
 
+Before release builds, the test workflow runs all non-graphical Godot scenarios in `tests/`, including the one-round automatic gameplay demonstration. Render-dependent screenshot scenarios remain available for local use and are not run in CI. Browser startup, touch controls, and PWA checks run after the browser build.
+
 ## Browser version
 
 [Play Exolon in your browser](https://gagarinbefree.github.io/Exolon/).
