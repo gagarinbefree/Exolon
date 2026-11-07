@@ -59,6 +59,63 @@
             outline: none;
         }
 
+        #touch-controls { display: none; }
+
+        @media (pointer: coarse) {
+            #canvas {
+                position: fixed;
+                left: 50%;
+                transform: translateX(-50%);
+                width: min(100vw, calc((100dvh - 180px) * 4 / 3)) !important;
+                height: auto !important;
+                top: env(safe-area-inset-top);
+                image-rendering: pixelated;
+            }
+            #touch-controls.ready {
+                position: fixed;
+                inset: 0;
+                z-index: 1;
+                display: flex;
+                align-items: flex-end;
+                justify-content: space-between;
+                padding: 0 max(12px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+                box-sizing: border-box;
+                pointer-events: none;
+            }
+            .touch-group { display: grid; gap: 4px; align-items: center; justify-items: center; }
+            .touch-directions { grid-template-columns: repeat(3, auto); }
+            .touch-directions [data-key="ArrowUp"] { grid-column: 2; grid-row: 1; }
+            .touch-directions [data-key="ArrowLeft"] { grid-column: 1; grid-row: 2; }
+            .touch-directions [data-key="ArrowDown"] { grid-column: 2; grid-row: 2; }
+            .touch-directions [data-key="ArrowRight"] { grid-column: 3; grid-row: 2; }
+            .touch-button {
+                width: clamp(48px, 14vw, 72px);
+                height: clamp(48px, 14vw, 72px);
+                padding: 0;
+                border: 2px solid rgba(255, 255, 255, .6);
+                border-radius: 50%;
+                background: rgba(20, 25, 35, .68);
+                color: white;
+                font: bold 21px system-ui, sans-serif;
+                touch-action: none;
+                user-select: none;
+                -webkit-user-select: none;
+                pointer-events: auto;
+            }
+            .touch-button[data-key="Space"] { background: rgba(153, 40, 32, .78); font-size: 14px; }
+            .touch-button.pressed { background: rgba(245, 194, 55, .85); color: #111; }
+        }
+
+        @media (pointer: coarse) and (orientation: landscape) {
+            #canvas {
+                top: 50%;
+                transform: translate(-50%, -50%);
+                width: min(calc(100vw - 2 * min(23vw, 172px)), calc(100dvh * 4 / 3)) !important;
+            }
+            #touch-controls.ready { align-items: center; }
+            .touch-button { width: min(48px, calc((min(23vw, 172px) - 20px) / 3)); height: min(48px, calc((min(23vw, 172px) - 20px) / 3)); }
+        }
+
         /* Painted above #status (which JavaScript would otherwise remove) so
            the message is visible when scripts are disabled. */
         noscript {
@@ -147,9 +204,21 @@
 </head>
 
 <body>
-    <canvas id="canvas">
+    <canvas id="canvas" width="512" height="384">
         Your browser does not support the canvas tag.
     </canvas>
+
+    <div id="touch-controls" aria-label="Game controls">
+        <div class="touch-group touch-directions">
+            <button class="touch-button" data-key="ArrowUp" aria-label="Jump or interact">▲</button>
+            <button class="touch-button" data-key="ArrowLeft" aria-label="Move left">◀</button>
+            <button class="touch-button" data-key="ArrowRight" aria-label="Move right">▶</button>
+            <button class="touch-button" data-key="ArrowDown" aria-label="Duck">▼</button>
+        </div>
+        <div class="touch-group">
+            <button class="touch-button" data-key="Space" aria-label="Fire or start">FIRE</button>
+        </div>
+    </div>
 
     <noscript>
         Your browser does not support JavaScript.
@@ -163,9 +232,74 @@
 
     <script src="godot.js"></script>
     <script>
+        // Forward independent pointers as the same keys used by the desktop game.
+        // This permits holding movement and fire together, including grenade fire.
+        const controls = document.getElementById('touch-controls');
+        const canvas = document.getElementById('canvas');
+        const activePointers = new Map();
+        const capturedPointers = new Set();
+        const keyCounts = new Map();
+        const keyDownAt = new Map();
+        const releaseTimers = new Map();
+        const keyCodes = { ArrowLeft: 37, ArrowUp: 38, ArrowRight: 39, ArrowDown: 40, Space: 32 };
+        function sendKey(code, pressed) {
+            canvas.dispatchEvent(new KeyboardEvent(pressed ? 'keydown' : 'keyup', {
+                key: code === 'Space' ? ' ' : code, code, keyCode: keyCodes[code],
+                which: keyCodes[code], bubbles: true, cancelable: true
+            }));
+        }
+        function changePointer(id, button) {
+            const old = activePointers.get(id);
+            if (old === button) return;
+            if (old) {
+                const code = old.dataset.key;
+                const count = keyCounts.get(code) - 1;
+                keyCounts.set(code, count);
+                if (!count) {
+                    old.classList.remove('pressed');
+                    // Very short taps still have to span a Godot frame.
+                    const delay = Math.max(0, 100 - (performance.now() - keyDownAt.get(code)));
+                    releaseTimers.set(code, setTimeout(() => { sendKey(code, false); releaseTimers.delete(code); }, delay));
+                }
+                activePointers.delete(id);
+            }
+            if (button) {
+                const code = button.dataset.key;
+                const count = keyCounts.get(code) || 0;
+                keyCounts.set(code, count + 1);
+                if (!count) {
+                    canvas.focus();
+                    if (releaseTimers.has(code)) { clearTimeout(releaseTimers.get(code)); releaseTimers.delete(code); }
+                    else { sendKey(code, true); keyDownAt.set(code, performance.now()); }
+                    button.classList.add('pressed');
+                }
+                activePointers.set(id, button);
+            }
+        }
+        controls.addEventListener('pointerdown', event => {
+            const button = event.target.closest('.touch-button');
+            if (!button) return;
+            event.preventDefault();
+            button.setPointerCapture(event.pointerId);
+            capturedPointers.add(event.pointerId);
+            changePointer(event.pointerId, button);
+        });
+        controls.addEventListener('pointermove', event => {
+            if (!capturedPointers.has(event.pointerId)) return;
+            const button = document.elementFromPoint(event.clientX, event.clientY)?.closest('.touch-button');
+            changePointer(event.pointerId, button || null);
+        });
+        for (const type of ['pointerup', 'pointercancel', 'lostpointercapture']) {
+            controls.addEventListener(type, event => { changePointer(event.pointerId, null); capturedPointers.delete(event.pointerId); });
+        }
+        window.addEventListener('blur', () => {
+            for (const id of [...activePointers.keys()]) changePointer(id, null);
+            capturedPointers.clear();
+        });
+
         const GODOT_CONFIG = {
             'args': [],
-            'canvasResizePolicy': 2,
+            'canvasResizePolicy': matchMedia('(pointer: coarse)').matches ? 0 : 2,
             'ensureCrossOriginIsolationHeaders': false,
             'executable': 'godot',
             'experimentalVK': false,
@@ -190,6 +324,7 @@
                 }
                 if (mode === 'hidden') {
                     statusOverlay.remove();
+                    controls.classList.add('ready');
                     initializing = false;
                     return;
                 }
