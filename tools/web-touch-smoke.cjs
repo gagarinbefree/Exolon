@@ -42,12 +42,12 @@ const fs = require('node:fs');
       await page.setViewportSize({ width, height });
       const bounds = await page.evaluate(() => {
         const rect = element => { const r = element.getBoundingClientRect(); return { x: r.x, y: r.y, width: r.width, height: r.height, right: r.right, bottom: r.bottom }; };
-        return { canvas: rect(document.querySelector('#canvas')), directions: rect(document.querySelector('#touch-directions')), fire: rect(document.querySelector('#touch-fire')), backgrounds: [...document.querySelectorAll('.touch-zone')].map(element => getComputedStyle(element).backgroundColor) };
+        return { canvas: rect(document.querySelector('#canvas')), directions: rect(document.querySelector('#touch-directions')), fire: rect(document.querySelector('#touch-fire')), zones: [...document.querySelectorAll('.touch-zone')].map(element => ({ background: getComputedStyle(element).backgroundColor, border: getComputedStyle(element).boxShadow, label: getComputedStyle(element, '::after').content })) };
       });
-      if (bounds.backgrounds.some(color => color !== 'rgba(0, 0, 0, 0)')) throw new Error('A touch zone is visible');
+      if (bounds.zones.some(zone => zone.background === 'rgba(0, 0, 0, 0)' || zone.border === 'none' || zone.label === 'none' || zone.label === '""')) throw new Error('Touch zone outline or label is missing');
       if (width > height) {
-        if (bounds.directions.right > bounds.canvas.x + 1 || bounds.fire.x < bounds.canvas.right - 1 || Math.abs(bounds.directions.width / width - .3085) > .01) throw new Error('Landscape layout differs from the diagram');
-      } else if (bounds.directions.y < bounds.canvas.bottom - 1 || bounds.fire.y < bounds.canvas.bottom - 1 || Math.abs(bounds.directions.width / width - .707) > .01) throw new Error('Portrait layout differs from the diagram');
+        if (bounds.fire.right > bounds.canvas.x + 1 || bounds.directions.x < bounds.canvas.right - 1 || Math.abs(bounds.directions.width / width - .3085) > .01) throw new Error('Landscape layout differs from the diagram');
+      } else if (bounds.directions.y < bounds.canvas.bottom - 1 || bounds.fire.y < bounds.canvas.bottom - 1 || bounds.fire.right > bounds.directions.x + 1 || Math.abs(bounds.directions.width / width - .707) > .01 || Math.abs(bounds.canvas.y + bounds.canvas.height / 2 - height / 2) > 1) throw new Error('Portrait layout differs from the diagram');
       for (const keys of zones) {
         await send('touchStart', [{ ...await point(keys), id: 1 }]);
         await assertHeld(keys.split(' '));
@@ -70,6 +70,6 @@ const fs = require('node:fs');
       await page.waitForTimeout(120);
     }
     if (errors.length) throw new Error(errors.join('\n'));
-    console.log('PASS: invisible control zones, all directions, diagonal sliding, simultaneous fire and both orientations');
+    console.log('PASS: visible control zones, all directions, diagonal sliding, simultaneous fire and both orientations');
   } finally { await browser.close(); }
 })().catch(error => { console.error(error); process.exitCode = 1; });

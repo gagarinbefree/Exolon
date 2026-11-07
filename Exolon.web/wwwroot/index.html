@@ -83,10 +83,10 @@
             #canvas {
                 position: fixed;
                 left: 50%;
-                transform: translateX(-50%);
+                transform: translate(-50%, -50%);
                 width: 100vw !important;
                 height: auto !important;
-                top: env(safe-area-inset-top);
+                top: 50dvh;
                 image-rendering: pixelated;
             }
             #touch-controls.ready {
@@ -98,17 +98,25 @@
             }
             .touch-area {
                 position: absolute;
-                top: calc(env(safe-area-inset-top) + 75vw);
+                top: calc(50dvh + 37.5vw);
                 bottom: 0;
                 touch-action: none; user-select: none; -webkit-user-select: none;
             }
             #touch-directions {
-                left: 0; width: 70.7%;
+                right: 0; width: 70.7%;
                 display: grid;
                 grid-template-columns: 6fr 15fr 7fr;
                 grid-template-rows: 1fr 1.5fr 1.5fr 1fr;
             }
-            .touch-zone { pointer-events: auto; touch-action: none; }
+            .touch-zone {
+                pointer-events: auto; touch-action: none;
+                display: grid; place-items: center;
+                background: rgba(255, 255, 255, .035);
+                box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .22);
+                color: rgba(255, 255, 255, .40);
+                font: 600 clamp(14px, 3vw, 24px) system-ui, sans-serif;
+            }
+            .touch-zone::after { content: attr(data-label); pointer-events: none; }
             .touch-zone[data-keys="ArrowUp ArrowLeft"] { grid-area: 1 / 1; }
             .touch-zone[data-keys="ArrowUp"] { grid-area: 1 / 2 / 3 / 3; }
             .touch-zone[data-keys="ArrowUp ArrowRight"] { grid-area: 1 / 3; }
@@ -117,7 +125,7 @@
             .touch-zone[data-keys="ArrowDown ArrowLeft"] { grid-area: 4 / 1; }
             .touch-zone[data-keys="ArrowDown"] { grid-area: 3 / 2 / 5 / 3; }
             .touch-zone[data-keys="ArrowDown ArrowRight"] { grid-area: 4 / 3; }
-            #touch-fire { right: 0; width: 29.3%; pointer-events: auto; }
+            #touch-fire { left: 0; width: 29.3%; pointer-events: auto; }
         }
 
         @media (pointer: coarse) and (orientation: landscape) {
@@ -225,16 +233,16 @@
 
     <div id="touch-controls" aria-label="Game controls">
         <div id="touch-directions" class="touch-area">
-            <div class="touch-zone" data-keys="ArrowUp ArrowLeft"></div>
-            <div class="touch-zone" data-keys="ArrowUp"></div>
-            <div class="touch-zone" data-keys="ArrowUp ArrowRight"></div>
-            <div class="touch-zone" data-keys="ArrowLeft"></div>
-            <div class="touch-zone" data-keys="ArrowRight"></div>
-            <div class="touch-zone" data-keys="ArrowDown ArrowLeft"></div>
-            <div class="touch-zone" data-keys="ArrowDown"></div>
-            <div class="touch-zone" data-keys="ArrowDown ArrowRight"></div>
+            <div class="touch-zone" data-keys="ArrowUp ArrowLeft" data-label="↖"></div>
+            <div class="touch-zone" data-keys="ArrowUp" data-label="↑"></div>
+            <div class="touch-zone" data-keys="ArrowUp ArrowRight" data-label="↗"></div>
+            <div class="touch-zone" data-keys="ArrowLeft" data-label="←"></div>
+            <div class="touch-zone" data-keys="ArrowRight" data-label="→"></div>
+            <div class="touch-zone" data-keys="ArrowDown ArrowLeft" data-label="↙"></div>
+            <div class="touch-zone" data-keys="ArrowDown" data-label="↓"></div>
+            <div class="touch-zone" data-keys="ArrowDown ArrowRight" data-label="↘"></div>
         </div>
-        <div id="touch-fire" class="touch-area touch-zone" data-keys="Space"></div>
+        <div id="touch-fire" class="touch-area touch-zone" data-keys="Space" data-label="FIRE"></div>
     </div>
 
     <noscript>

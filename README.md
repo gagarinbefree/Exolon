@@ -6,7 +6,7 @@ A work-in-progress C# port for Godot 4 .NET, based on the [melonJS Exolon projec
 
 Open `project.godot` in Godot 4.7.2 .NET, build the C# project with the .NET 10 SDK, and run the main scene. Press Space on the title screen to start. Use the left and right arrows to move, up to jump or use a teleport, down to crouch, and Space to shoot. Hold Space to fire a grenade.
 
-On a touchscreen, use the invisible control areas shown in [the control diagram](docs/virtual_keyboard.txt): directions are on the left and fire is on the right. Tap the fire area to start or shoot; hold it to throw a grenade. The controls are below the game in portrait orientation and on either side in landscape orientation.
+On a touchscreen, use the control areas shown in [the control diagram](docs/virtual_keyboard.txt): fire is on the left and directions are on the right. Tap the fire area to start or shoot; hold it to throw a grenade. The controls are below the game in portrait orientation and on either side in landscape orientation.
 
 All 75 zones are enabled and available as editor previews. Gameplay has been checked with automated scenarios and comparisons against the melonJS version; a complete manual playthrough and further fidelity checks are still needed.
 
