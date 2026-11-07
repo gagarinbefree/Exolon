@@ -20,6 +20,8 @@ public partial class Player : CharacterBody2D
 	private float _descendingDistance;
 	public int Direction => _direction;
 	public bool IsDucking { get; private set; }
+	// melonJS offsets the 46x52 crouching box 12 pixels from the sprite top.
+	public Rect2 CollisionBounds => new(Position - new Vector2(23, IsDucking ? 20 : 31), new Vector2(46, IsDucking ? 52 : 63));
 	public bool IsDead { get; private set; }
 	public bool IsInvincible { get; private set; }
 	public bool IsArmored { get; private set; }

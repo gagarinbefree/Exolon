@@ -386,7 +386,7 @@ public partial class FirstScreen : Node2D
 
 		foreach (ObstacleEntity obstacle in _obstacles)
 		{
-			if (!completing && obstacle is BeamEntity && obstacle.Alive && obstacle.Bounds.Grow(2).Intersects(new Rect2(_player.Position - new Vector2(23, 31), new Vector2(46, 63))))
+			if (!completing && obstacle is BeamEntity && obstacle.Alive && obstacle.Bounds.Grow(2).Intersects(_player.CollisionBounds))
 				if (_player.Kill()) _deathTime = 0;
 			if (obstacle is TurretEntity turret && turret.Alive && turret.Update(_random))
 			{
@@ -466,7 +466,7 @@ public partial class FirstScreen : Node2D
 	private bool TryInteract()
 	{
 		var teleports = _objects.FindAll(o => o.Name == "teleport");
-		Rect2 player = new(_player.Position - new Vector2(23, 31), new Vector2(46, 63));
+		Rect2 player = _player.CollisionBounds;
 		for (int i = 0; teleports.Count == 2 && i < 2; i++)
 		{
 			var source = teleports[i];
@@ -492,7 +492,7 @@ public partial class FirstScreen : Node2D
 	private void CollectAmmoPack()
 	{
 		if (_ammoPackCollected || _player.IsDead) return;
-		Rect2 player = new(_player.Position - new Vector2(23, 31), new Vector2(46, 63));
+		Rect2 player = _player.CollisionBounds;
 		foreach (var (name, x, y, _) in _objects)
 		{
 			if (name != "ammo_pack" || !player.Intersects(new Rect2(x + 2, y - 30, 28, 30))) continue;
@@ -505,7 +505,7 @@ public partial class FirstScreen : Node2D
 
 	private void UpdatePiston(float dt)
 	{
-		Rect2 player = new(_player.Position - new Vector2(23, 31), new Vector2(46, 63));
+		Rect2 player = _player.CollisionBounds;
 		foreach (var (x, bottom, piston) in _pistons)
 		{
 			piston.Update(dt, _random);
@@ -518,7 +518,7 @@ public partial class FirstScreen : Node2D
 	private void CollectGrenadePack()
 	{
 		if (_grenadePackCollected || _player.IsDead) return;
-		Rect2 player = new(_player.Position - new Vector2(23, 31), new Vector2(46, 63));
+		Rect2 player = _player.CollisionBounds;
 		foreach (var (name, x, y, _) in _objects)
 		{
 			if (name != "grenade_pack" || !player.Intersects(new Rect2(x + 2, y - 30, 28, 30))) continue;
@@ -618,7 +618,7 @@ public partial class FirstScreen : Node2D
 					BurstFlyingEnemy(j); remove = true; break;
 				}
 			}
-			if (_completeWindow == null && shot.Kind is ("turret_bullet" or "double_launcher_bullet") && rect.Intersects(new Rect2(_player.Position - new Vector2(23, 31), new Vector2(46, 63))))
+			if (_completeWindow == null && shot.Kind is ("turret_bullet" or "double_launcher_bullet") && rect.Intersects(_player.CollisionBounds))
 			{
 				if (_player.Kill()) _deathTime = 0;
 				if (shot.Kind == "double_launcher_bullet") { _effects.Add(new Effect { Kind = "blaster_explosion", Position = shot.Position, Duration = 0.35f }); PlaySound("burst"); }
@@ -668,7 +668,7 @@ public partial class FirstScreen : Node2D
 		}
 		if (_missile == null) return;
 		_missile.Update(_player.Position.Y - 32);
-		Rect2 playerBounds = new(_player.Position - new Vector2(23, 31), new Vector2(46, 63));
+		Rect2 playerBounds = _player.CollisionBounds;
 		if (_completeWindow == null && _missile.Bounds.Intersects(playerBounds))
 		{
 			if (_player.Kill()) _deathTime = 0;
@@ -687,7 +687,7 @@ public partial class FirstScreen : Node2D
 
 	private void UpdateLaunchers(float dt)
 	{
-		Rect2 playerBounds = new(_player.Position - new Vector2(23, 31), new Vector2(46, 63));
+		Rect2 playerBounds = _player.CollisionBounds;
 		foreach (DoubleLauncherEntity launcher in _launchers)
 		{
 			if (_completeWindow == null && launcher.Bounds.Intersects(playerBounds) && launcher.Capture()) { _awards.Add(new AwardPointsEntity(launcher.CapturePoints)); PlaySound("points"); }
@@ -713,7 +713,7 @@ public partial class FirstScreen : Node2D
 	private void UpdateExit()
 	{
 		if (_player.IsDead) return;
-		Rect2 player = new(_player.Position - new Vector2(23, 31), new Vector2(46, 63));
+		Rect2 player = _player.CollisionBounds;
 		if (!_exits.Exists(exit => exit.Intersects(player))) return;
 		_exits.Clear();
 		int bravery = _player.IsArmored ? 0 : 10000;
@@ -743,7 +743,7 @@ public partial class FirstScreen : Node2D
 
 	private void UpdateEggs()
 	{
-		Rect2 playerBounds = new(_player.Position - new Vector2(23, 31), new Vector2(46, 63));
+		Rect2 playerBounds = _player.CollisionBounds;
 		for (int i = _eggs.Count - 1; i >= 0; i--)
 		{
 			EggEntity egg = _eggs[i];
@@ -767,7 +767,7 @@ public partial class FirstScreen : Node2D
 		Vector2 playerTopLeft = _player.Position - new Vector2(24, 32);
 		if (_bubbleCreator?.Update(dt, playerTopLeft, _player.IsDead) == true)
 			_bubbles.Add(new BubbleEntity(playerTopLeft, _random, _bubbleCreator.Behavior));
-		Rect2 playerBounds = new(_player.Position - new Vector2(23, 31), new Vector2(46, 63));
+		Rect2 playerBounds = _player.CollisionBounds;
 		for (int i = _bubbles.Count - 1; i >= 0; i--)
 		{
 			BubbleEntity bubble = _bubbles[i];
@@ -786,7 +786,7 @@ public partial class FirstScreen : Node2D
 		Vector2 playerTopLeft = _player.Position - new Vector2(24, 32);
 		if (_interceptorCreator?.Update(dt, playerTopLeft, _player.IsDead) == true)
 			_interceptors.Add(new InterceptorEntity(playerTopLeft, _random, _interceptorCreator.Behavior));
-		Rect2 playerBounds = new(_player.Position - new Vector2(23, 31), new Vector2(46, 63));
+		Rect2 playerBounds = _player.CollisionBounds;
 		for (int i = _interceptors.Count - 1; i >= 0; i--)
 		{
 			InterceptorEntity interceptor = _interceptors[i];
@@ -813,7 +813,7 @@ public partial class FirstScreen : Node2D
 		Vector2 playerTopLeft = _player.Position - new Vector2(24, 32);
 		if (_jellyfishCreator?.Update(dt, playerTopLeft, _player.IsDead) == true)
 			_jellyfish.Add(new JellyfishEntity(playerTopLeft, _random, _jellyfishCreator.Behavior));
-		Rect2 playerBounds = new(_player.Position - new Vector2(23, 31), new Vector2(46, 63));
+		Rect2 playerBounds = _player.CollisionBounds;
 		for (int i = _jellyfish.Count - 1; i >= 0; i--)
 		{
 			JellyfishEntity jellyfish = _jellyfish[i];
@@ -845,7 +845,7 @@ public partial class FirstScreen : Node2D
 			_harbringerTimer = 0;
 			if (playerTopLeft.X <= 320) _harbringers.Add(new HarbringerEntity(playerTopLeft));
 		}
-		Rect2 playerBounds = new(_player.Position - new Vector2(23, 31), new Vector2(46, 63));
+		Rect2 playerBounds = _player.CollisionBounds;
 		for (int i = _harbringers.Count - 1; i >= 0; i--)
 		{
 			HarbringerEntity enemy = _harbringers[i]; enemy.Update();
@@ -864,7 +864,7 @@ public partial class FirstScreen : Node2D
 		Vector2 playerTopLeft = _player.Position - new Vector2(24, 32);
 		if (_flyingCreator?.Update(dt, playerTopLeft, _player.IsDead) == true)
 			_flyingEnemies.Add(new FlyingEnemyEntity(_flyingCreator.Kind, _flyingCreator.Behavior, playerTopLeft, _random));
-		Rect2 playerBounds = new(_player.Position - new Vector2(23, 31), new Vector2(46, 63));
+		Rect2 playerBounds = _player.CollisionBounds;
 		for (int i = _flyingEnemies.Count - 1; i >= 0; i--)
 		{
 			FlyingEnemyEntity enemy = _flyingEnemies[i]; enemy.Update(_random);
@@ -884,7 +884,7 @@ public partial class FirstScreen : Node2D
 		Vector2 playerTopLeft = _player.Position - new Vector2(24, 32);
 		if (_louseCreator?.Update(dt, playerTopLeft, _player.IsDead) == true)
 			_lice.Add(new LouseEntity(playerTopLeft, _random, _louseCreator.Behavior));
-		Rect2 playerBounds = new(_player.Position - new Vector2(23, 31), new Vector2(46, 63));
+		Rect2 playerBounds = _player.CollisionBounds;
 		for (int i = _lice.Count - 1; i >= 0; i--)
 		{
 			LouseEntity louse = _lice[i]; louse.Update();
@@ -913,8 +913,7 @@ public partial class FirstScreen : Node2D
 
 	private void UpdateMines()
 	{
-		Vector2 topLeft = _player.Position - new Vector2(23, _player.IsDucking ? 20 : 31);
-		Rect2 playerBounds = new(topLeft, new Vector2(46, _player.IsDucking ? 52 : 63));
+		Rect2 playerBounds = _player.CollisionBounds;
 		foreach (MineEntity mine in _mines)
 		{
 			if (_completeWindow != null || mine.Triggered || !mine.TriggerBounds.Intersects(playerBounds)) continue;
