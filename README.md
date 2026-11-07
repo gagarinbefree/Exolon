@@ -1,11 +1,27 @@
-# Exolon
-
 [![Test and deploy](https://github.com/gagarinbefree/Exolon/actions/workflows/web.yml/badge.svg)](https://github.com/gagarinbefree/Exolon/actions/workflows/web.yml)
 [![Tests](https://img.shields.io/github/check-runs/gagarinbefree/Exolon/main?nameFilter=Test%20Godot%20gameplay&label=tests)](https://github.com/gagarinbefree/Exolon/actions/workflows/web.yml)
 [![Latest release](https://img.shields.io/github/v/release/gagarinbefree/Exolon)](https://github.com/gagarinbefree/Exolon/releases/latest)
 [![Play in browser](https://img.shields.io/badge/play-in%20browser-blue)](https://gagarinbefree.github.io/Exolon/)
 
-An in-progress Godot 4 / C# remake of the 1987 ZX Spectrum action game, based on the melonJS version of Exolon.
+<p align="center">
+  <img src="Exolon.web/wwwroot/pwa-192.png" alt="Exolon app icon" width="112">
+</p>
+
+<h1 align="center">Exolon</h1>
+
+<p align="center">
+  <img src="assets/images/title.png" alt="Exolon" width="512">
+</p>
+
+<p align="center">
+  An in-progress Godot 4 / C# remake of the 1987 ZX Spectrum action game, based on the melonJS version of Exolon.
+</p>
+
+<p align="center">
+  <a href="https://gagarinbefree.github.io/Exolon/"><strong>Play in your browser</strong></a>
+  &nbsp; · &nbsp;
+  <a href="https://github.com/gagarinbefree/Exolon/releases/latest"><strong>Download for Android</strong></a>
+</p>
 
 ## Scenario
 
@@ -14,6 +30,25 @@ Guide Vitorc across hostile alien terrain, from one screen to the next. Enemy cr
 Along the way, Vitorc can enter an exoskeleton capsule. The armour provides extra protection and a double blaster shot, but completing a level without it earns a bravery bonus.
 
 This remake currently contains **three levels of 25 zones**. All 75 zones can be opened in the Godot editor. The game is still being checked against the melonJS version and has not yet had a complete manual playthrough.
+
+## Screenshots
+
+| Zone 1 | Zone 3 |
+| :---: | :---: |
+| ![Vitorc arrives on the first screen of Exolon](docs/screenshots/zone-01.png) | ![Vitorc encounters teleports and a turret in zone 3](docs/screenshots/zone-03.png) |
+
+Touch controls adapt to the orientation of your phone or tablet:
+
+<table>
+  <tr>
+    <th>Landscape</th>
+    <th>Portrait</th>
+  </tr>
+  <tr>
+    <td align="center"><img src="docs/screenshots/touch-landscape.png" alt="Landscape browser game with touch controls beside the screen" width="600"></td>
+    <td align="center"><img src="docs/screenshots/touch-portrait.png" alt="Portrait browser game with touch controls below the screen" width="200"></td>
+  </tr>
+</table>
 
 ## Loading
 
