@@ -84,7 +84,7 @@
                 position: fixed;
                 left: 50%;
                 transform: translateX(-50%);
-                width: min(100vw, calc((100dvh - 180px) * 4 / 3)) !important;
+                width: 100vw !important;
                 height: auto !important;
                 top: env(safe-area-inset-top);
                 image-rendering: pixelated;
@@ -93,45 +93,41 @@
                 position: fixed;
                 inset: 0;
                 z-index: 1;
-                display: flex;
-                align-items: flex-end;
-                justify-content: space-between;
-                padding: 0 max(12px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
-                box-sizing: border-box;
+                display: block;
                 pointer-events: none;
             }
-            .touch-group { display: grid; gap: 4px; align-items: center; justify-items: center; }
-            .touch-directions { grid-template-columns: repeat(3, auto); }
-            .touch-directions [data-key="ArrowUp"] { grid-column: 2; grid-row: 1; }
-            .touch-directions [data-key="ArrowLeft"] { grid-column: 1; grid-row: 2; }
-            .touch-directions [data-key="ArrowDown"] { grid-column: 2; grid-row: 2; }
-            .touch-directions [data-key="ArrowRight"] { grid-column: 3; grid-row: 2; }
-            .touch-button {
-                width: clamp(48px, 14vw, 72px);
-                height: clamp(48px, 14vw, 72px);
-                padding: 0;
-                border: 2px solid rgba(255, 255, 255, .6);
-                border-radius: 50%;
-                background: rgba(20, 25, 35, .68);
-                color: white;
-                font: bold 21px system-ui, sans-serif;
-                touch-action: none;
-                user-select: none;
-                -webkit-user-select: none;
-                pointer-events: auto;
+            .touch-area {
+                position: absolute;
+                top: calc(env(safe-area-inset-top) + 75vw);
+                bottom: 0;
+                touch-action: none; user-select: none; -webkit-user-select: none;
             }
-            .touch-button[data-key="Space"] { background: rgba(153, 40, 32, .78); font-size: 14px; }
-            .touch-button.pressed { background: rgba(245, 194, 55, .85); color: #111; }
+            #touch-directions {
+                left: 0; width: 70.7%;
+                display: grid;
+                grid-template-columns: 6fr 15fr 7fr;
+                grid-template-rows: 1fr 1.5fr 1.5fr 1fr;
+            }
+            .touch-zone { pointer-events: auto; touch-action: none; }
+            .touch-zone[data-keys="ArrowUp ArrowLeft"] { grid-area: 1 / 1; }
+            .touch-zone[data-keys="ArrowUp"] { grid-area: 1 / 2 / 3 / 3; }
+            .touch-zone[data-keys="ArrowUp ArrowRight"] { grid-area: 1 / 3; }
+            .touch-zone[data-keys="ArrowLeft"] { grid-area: 2 / 1 / 4 / 2; }
+            .touch-zone[data-keys="ArrowRight"] { grid-area: 2 / 3 / 4 / 4; }
+            .touch-zone[data-keys="ArrowDown ArrowLeft"] { grid-area: 4 / 1; }
+            .touch-zone[data-keys="ArrowDown"] { grid-area: 3 / 2 / 5 / 3; }
+            .touch-zone[data-keys="ArrowDown ArrowRight"] { grid-area: 4 / 3; }
+            #touch-fire { right: 0; width: 29.3%; pointer-events: auto; }
         }
 
         @media (pointer: coarse) and (orientation: landscape) {
             #canvas {
                 top: 50%;
                 transform: translate(-50%, -50%);
-                width: min(calc(100vw - 2 * min(23vw, 172px)), calc(100dvh * 4 / 3)) !important;
+                width: min(38.3vw, calc(100dvh * 4 / 3)) !important;
             }
-            #touch-controls.ready { align-items: center; }
-            .touch-button { width: min(48px, calc((min(23vw, 172px) - 20px) / 3)); height: min(48px, calc((min(23vw, 172px) - 20px) / 3)); }
+            .touch-area { top: 0; }
+            #touch-directions, #touch-fire { width: 30.85%; }
         }
 
         /* Painted above #status (which JavaScript would otherwise remove) so
@@ -228,15 +224,17 @@
     </canvas>
 
     <div id="touch-controls" aria-label="Game controls">
-        <div class="touch-group touch-directions">
-            <button class="touch-button" data-key="ArrowUp" aria-label="Jump or interact">▲</button>
-            <button class="touch-button" data-key="ArrowLeft" aria-label="Move left">◀</button>
-            <button class="touch-button" data-key="ArrowRight" aria-label="Move right">▶</button>
-            <button class="touch-button" data-key="ArrowDown" aria-label="Duck">▼</button>
+        <div id="touch-directions" class="touch-area">
+            <div class="touch-zone" data-keys="ArrowUp ArrowLeft"></div>
+            <div class="touch-zone" data-keys="ArrowUp"></div>
+            <div class="touch-zone" data-keys="ArrowUp ArrowRight"></div>
+            <div class="touch-zone" data-keys="ArrowLeft"></div>
+            <div class="touch-zone" data-keys="ArrowRight"></div>
+            <div class="touch-zone" data-keys="ArrowDown ArrowLeft"></div>
+            <div class="touch-zone" data-keys="ArrowDown"></div>
+            <div class="touch-zone" data-keys="ArrowDown ArrowRight"></div>
         </div>
-        <div class="touch-group">
-            <button class="touch-button" data-key="Space" aria-label="Fire or start">FIRE</button>
-        </div>
+        <div id="touch-fire" class="touch-area touch-zone" data-keys="Space"></div>
     </div>
 
     <noscript>
@@ -285,54 +283,56 @@
                 which: keyCodes[code], bubbles: true, cancelable: true
             }));
         }
-        function changePointer(id, button) {
-            const old = activePointers.get(id);
-            if (old === button) return;
-            if (old) {
-                const code = old.dataset.key;
+        function changePointer(id, zone, delayedRelease = false) {
+            const oldKeys = activePointers.get(id) || [];
+            const newKeys = zone ? zone.dataset.keys.split(' ') : [];
+            for (const code of oldKeys.filter(key => !newKeys.includes(key))) {
                 const count = keyCounts.get(code) - 1;
                 keyCounts.set(code, count);
                 if (!count) {
-                    old.classList.remove('pressed');
-                    // Very short taps still have to span a Godot frame.
-                    const delay = Math.max(0, 100 - (performance.now() - keyDownAt.get(code)));
+                    // A short tap must span a Godot frame; sliding changes direction immediately.
+                    const delay = delayedRelease ? Math.max(0, 100 - (performance.now() - keyDownAt.get(code))) : 0;
+                    if (!delay) { sendKey(code, false); continue; }
                     releaseTimers.set(code, setTimeout(() => { sendKey(code, false); releaseTimers.delete(code); }, delay));
                 }
-                activePointers.delete(id);
             }
-            if (button) {
-                const code = button.dataset.key;
+            for (const code of newKeys.filter(key => !oldKeys.includes(key))) {
                 const count = keyCounts.get(code) || 0;
                 keyCounts.set(code, count + 1);
                 if (!count) {
                     canvas.focus();
                     if (releaseTimers.has(code)) { clearTimeout(releaseTimers.get(code)); releaseTimers.delete(code); }
                     else { sendKey(code, true); keyDownAt.set(code, performance.now()); }
-                    button.classList.add('pressed');
                 }
-                activePointers.set(id, button);
             }
+            if (newKeys.length) activePointers.set(id, newKeys);
+            else activePointers.delete(id);
         }
         controls.addEventListener('pointerdown', event => {
-            const button = event.target.closest('.touch-button');
-            if (!button) return;
+            const zone = event.target.closest('.touch-zone');
+            if (!zone) return;
             event.preventDefault();
-            button.setPointerCapture(event.pointerId);
+            zone.setPointerCapture(event.pointerId);
             capturedPointers.add(event.pointerId);
-            changePointer(event.pointerId, button);
+            changePointer(event.pointerId, zone);
         });
         controls.addEventListener('pointermove', event => {
             if (!capturedPointers.has(event.pointerId)) return;
-            const button = document.elementFromPoint(event.clientX, event.clientY)?.closest('.touch-button');
-            changePointer(event.pointerId, button || null);
+            const zone = document.elementFromPoint(event.clientX, event.clientY)?.closest('.touch-zone');
+            changePointer(event.pointerId, zone || null);
         });
         for (const type of ['pointerup', 'pointercancel', 'lostpointercapture']) {
-            controls.addEventListener(type, event => { changePointer(event.pointerId, null); capturedPointers.delete(event.pointerId); });
+            controls.addEventListener(type, event => { changePointer(event.pointerId, null, type === 'pointerup'); capturedPointers.delete(event.pointerId); });
         }
-        window.addEventListener('blur', () => {
+        function releaseAllTouches() {
             for (const id of [...activePointers.keys()]) changePointer(id, null);
             capturedPointers.clear();
-        });
+            for (const [code, timer] of releaseTimers) { clearTimeout(timer); sendKey(code, false); }
+            releaseTimers.clear();
+        }
+        window.addEventListener('blur', releaseAllTouches);
+        window.addEventListener('resize', releaseAllTouches);
+        document.addEventListener('visibilitychange', () => { if (document.hidden) releaseAllTouches(); });
 
         const GODOT_CONFIG = {
             'args': [],
