@@ -8,7 +8,7 @@ match = re.fullmatch(r"(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)", version)
 if not match:
     raise SystemExit("Android version must use X.Y.Z (for example 0.1.0)")
 major, minor, patch = map(int, match.groups())
-if minor > 999 or patch > 999 or major > 2099:
+if len(sys.argv) <= 2 and (minor > 999 or patch > 999 or major > 2099):
     raise SystemExit("Android version exceeds the supported version-code range")
 code = int(sys.argv[2]) if len(sys.argv) > 2 else major * 1_000_000 + minor * 1_000 + patch
 if code < 1 or code > 2_100_000_000:
