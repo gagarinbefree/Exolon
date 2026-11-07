@@ -13,13 +13,6 @@
   <a href="https://github.com/gagarinbefree/Exolon/releases/latest"><strong>Download for Android</strong></a>
 </p>
 
-<table>
-  <tr>
-    <td align="center" valign="middle" width="75%"><h1>Exolon</h1></td>
-    <td align="center" valign="middle" width="25%"><img src="Exolon.web/wwwroot/pwa-192.png" alt="Exolon app icon" width="112"></td>
-  </tr>
-</table>
-
 <p align="center">
   <img src="assets/images/title.png" alt="Exolon" width="512">
 </p>
