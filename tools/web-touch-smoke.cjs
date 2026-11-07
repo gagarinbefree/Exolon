@@ -10,10 +10,15 @@ const fs = require('node:fs');
     await page.goto(process.env.EXOLON_WEB_URL || 'http://127.0.0.1:8765/');
     await page.waitForSelector('#touch-controls.ready', { timeout: 120000 });
     const canvas = page.locator('#canvas');
+    await page.evaluate(() => window.dispatchEvent(new Event('beforeinstallprompt', { cancelable: true })));
+    if (!await page.locator('#install-app').isVisible()) throw new Error('Install prompt was not shown on the title screen');
     const title = await canvas.screenshot();
     await page.locator('#touch-fire').tap();
     await page.waitForTimeout(400);
     if ((await canvas.screenshot()).equals(title)) throw new Error('Touching the fire zone did not start the game');
+    if (await page.locator('#install-app').isVisible()) throw new Error('Install prompt remained visible after starting');
+    await page.evaluate(() => window.dispatchEvent(new Event('beforeinstallprompt', { cancelable: true })));
+    if (await page.locator('#install-app').isVisible()) throw new Error('Install prompt reappeared during gameplay');
     const cdp = await page.context().newCDPSession(page);
     const point = async keys => {
       const box = await page.locator(`[data-keys="${keys}"]`).boundingBox();
@@ -42,9 +47,9 @@ const fs = require('node:fs');
       await page.setViewportSize({ width, height });
       const bounds = await page.evaluate(() => {
         const rect = element => { const r = element.getBoundingClientRect(); return { x: r.x, y: r.y, width: r.width, height: r.height, right: r.right, bottom: r.bottom }; };
-        return { canvas: rect(document.querySelector('#canvas')), directions: rect(document.querySelector('#touch-directions')), fire: rect(document.querySelector('#touch-fire')), zones: [...document.querySelectorAll('.touch-zone')].map(element => ({ background: getComputedStyle(element).backgroundColor, border: getComputedStyle(element).boxShadow, label: getComputedStyle(element, '::after').content })) };
+        return { canvas: rect(document.querySelector('#canvas')), directions: rect(document.querySelector('#touch-directions')), fire: rect(document.querySelector('#touch-fire')), zones: [...document.querySelectorAll('.touch-zone')].map(element => ({ background: getComputedStyle(element).backgroundColor, label: getComputedStyle(element, '::after').content })) };
       });
-      if (bounds.zones.some(zone => zone.background === 'rgba(0, 0, 0, 0)' || zone.border === 'none' || zone.label === 'none' || zone.label === '""')) throw new Error('Touch zone outline or label is missing');
+      if (bounds.zones.some(zone => zone.background === 'rgba(0, 0, 0, 0)' || zone.label === 'none' || zone.label === '""')) throw new Error('Touch zone background or label is missing');
       if (width > height) {
         if (bounds.fire.right > bounds.canvas.x + 1 || bounds.directions.x < bounds.canvas.right - 1 || Math.abs(bounds.directions.width / width - .3085) > .01) throw new Error('Landscape layout differs from the diagram');
       } else if (bounds.directions.y < bounds.canvas.bottom - 1 || bounds.fire.y < bounds.canvas.bottom - 1 || bounds.fire.right > bounds.directions.x + 1 || Math.abs(bounds.directions.width / width - .707) > .01 || Math.abs(bounds.canvas.y + bounds.canvas.height / 2 - height / 2) > 1) throw new Error('Portrait layout differs from the diagram');
@@ -66,6 +71,13 @@ const fs = require('node:fs');
       const left = await page.locator('[data-keys="ArrowLeft"]').boundingBox();
       const right = await page.locator('[data-keys="ArrowRight"]').boundingBox();
       if (up.width >= left.width || up.width >= right.width || await page.locator('[data-keys^="ArrowDown "]').count()) throw new Error('Direction zones do not match the new diagram');
+      const diagonal = await page.locator('[data-keys="ArrowUp ArrowLeft"]').boundingBox();
+      if (Math.abs(diagonal.height / bounds.directions.height - .4) > .01) throw new Error('Upper diagonal zones should occupy 40% of the height');
+      const borders = await page.evaluate(() => [...document.querySelectorAll('.touch-zone')].map(element => {
+        const r = element.getBoundingClientRect(), style = getComputedStyle(element), outer = document.querySelector('#touch-directions').getBoundingClientRect();
+        return { fire: element.id === 'touch-fire', left: r.left === outer.left && style.borderLeftWidth !== '0px', right: r.right === outer.right && style.borderRightWidth !== '0px', top: r.top === outer.top && style.borderTopWidth !== '0px', bottom: r.bottom === outer.bottom && style.borderBottomWidth !== '0px' };
+      }));
+      if (borders.some(border => border.left || border.right || border.top || border.bottom)) throw new Error('Outer control border is visible');
       const upLeft = await point('ArrowUp ArrowLeft');
       const upRight = await point('ArrowUp ArrowRight');
       const fire = await point('Space');

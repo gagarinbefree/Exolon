@@ -106,13 +106,13 @@
                 right: 0; width: 70.7%;
                 display: grid;
                 grid-template-columns: 9fr 7fr 11fr;
-                grid-template-rows: 1fr 1.5fr 1.5fr 1fr;
+                grid-template-rows: 2fr .5fr 1.5fr 1fr;
             }
             .touch-zone {
                 pointer-events: auto; touch-action: none;
                 display: grid; place-items: center;
                 background: rgba(255, 255, 255, .035);
-                box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .22);
+                box-sizing: border-box;
                 color: rgba(255, 255, 255, .40);
                 font: 600 clamp(14px, 3vw, 24px) system-ui, sans-serif;
             }
@@ -123,6 +123,13 @@
             .touch-zone[data-keys="ArrowLeft"] { grid-area: 2 / 1 / 5 / 2; }
             .touch-zone[data-keys="ArrowRight"] { grid-area: 2 / 3 / 5 / 4; }
             .touch-zone[data-keys="ArrowDown"] { grid-area: 3 / 2 / 5 / 3; }
+            .touch-zone[data-keys="ArrowUp ArrowLeft"],
+            .touch-zone[data-keys="ArrowLeft"],
+            .touch-zone[data-keys="ArrowUp"],
+            .touch-zone[data-keys="ArrowDown"] { border-right: 1px solid rgba(255, 255, 255, .22); }
+            .touch-zone[data-keys="ArrowUp ArrowLeft"],
+            .touch-zone[data-keys="ArrowUp ArrowRight"],
+            .touch-zone[data-keys="ArrowUp"] { border-bottom: 1px solid rgba(255, 255, 255, .22); }
             #touch-fire { left: 0; width: 29.3%; pointer-events: auto; }
         }
 
@@ -253,11 +260,12 @@
 
     <script>
         let installPrompt;
+        let gameStarted = false;
         const installButton = document.getElementById('install-app');
         window.addEventListener('beforeinstallprompt', event => {
             event.preventDefault();
             installPrompt = event;
-            installButton.hidden = false;
+            if (!gameStarted) installButton.hidden = false;
         });
         installButton.addEventListener('click', async () => {
             if (!installPrompt) return;
@@ -267,6 +275,12 @@
             await prompt.prompt();
         });
         window.addEventListener('appinstalled', () => { installPrompt = null; installButton.hidden = true; });
+        window.addEventListener('keydown', event => {
+            if (event.code === 'Space' && !document.getElementById('status')) {
+                gameStarted = true;
+                installButton.hidden = true;
+            }
+        });
     </script>
     <script src="godot.js"></script>
     <script>
