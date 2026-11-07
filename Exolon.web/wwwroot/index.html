@@ -111,9 +111,9 @@
             .touch-zone {
                 pointer-events: auto; touch-action: none;
                 display: grid; place-items: center;
-                background: rgba(255, 255, 255, .035);
+                background: rgba(255, 255, 255, .02);
                 box-sizing: border-box;
-                color: rgba(255, 255, 255, .40);
+                color: rgba(255, 255, 255, .25);
                 font: 600 clamp(14px, 3vw, 24px) system-ui, sans-serif;
             }
             .touch-zone::after { content: attr(data-label); pointer-events: none; }
@@ -126,11 +126,15 @@
             .touch-zone[data-keys="ArrowUp ArrowLeft"],
             .touch-zone[data-keys="ArrowLeft"],
             .touch-zone[data-keys="ArrowUp"],
-            .touch-zone[data-keys="ArrowDown"] { border-right: 1px solid rgba(255, 255, 255, .22); }
+            .touch-zone[data-keys="ArrowDown"] { border-right: 1px solid rgba(255, 255, 255, .13); }
             .touch-zone[data-keys="ArrowUp ArrowLeft"],
             .touch-zone[data-keys="ArrowUp ArrowRight"],
-            .touch-zone[data-keys="ArrowUp"] { border-bottom: 1px solid rgba(255, 255, 255, .22); }
+            .touch-zone[data-keys="ArrowUp"] { border-bottom: 1px solid rgba(255, 255, 255, .13); }
             #touch-fire { left: 0; width: 29.3%; pointer-events: auto; }
+        }
+
+        @media (pointer: coarse) and (orientation: portrait) {
+            #touch-directions { box-shadow: inset 1px 0 rgba(255, 255, 255, .13); }
         }
 
         @media (pointer: coarse) and (orientation: landscape) {

@@ -1,14 +1,15 @@
 <Project Sdk="Godot.NET.Sdk/4.7.2">
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
+    <!-- Godot 4.7's official Android export templates embed the .NET 9 runtime. -->
     <EnableDynamicLoading>true</EnableDynamicLoading>
     <Nullable>enable</Nullable>
   </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="2dog.godotsharp" Version="$(TwoDogVersion)" />
+        <PackageReference Include="2dog.godotsharp" Version="$(TwoDogVersion)" Condition="'$(GodotTargetPlatform)' != 'android'" />
     </ItemGroup>
     <ItemGroup>
-        <PackageReference Include="2dog.godotsharp.editor" Version="$(TwoDogVersion)" Condition="'$(Configuration)' == 'Debug' Or '$(Configuration)' == 'Editor'" />
+        <PackageReference Include="2dog.godotsharp.editor" Version="$(TwoDogVersion)" Condition="'$(GodotTargetPlatform)' != 'android' And ('$(Configuration)' == 'Debug' Or '$(Configuration)' == 'Editor')" />
     </ItemGroup>
     <!-- added by the 2dog tool: properties 2dog hosts need that were not already set -->
     <PropertyGroup>

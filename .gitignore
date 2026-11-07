@@ -11,4 +11,6 @@ obj/
 # Generated browser bundle
 Exolon.web/AppBundle/
 artifacts/
+/build/
+__pycache__/
 *.csproj.old

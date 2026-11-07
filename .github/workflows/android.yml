@@ -1,0 +1,95 @@
+name: Build and publish Android APK
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Android version (X.Y.Z)
+        required: true
+        default: 0.1.0
+  push:
+    tags:
+      - 'v[0-9]*'
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  android:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      GODOT_ANDROID_KEYSTORE_RELEASE_PATH: ${{ runner.temp }}/exolon-release.keystore
+      GODOT_ANDROID_KEYSTORE_RELEASE_USER: ${{ secrets.ANDROID_KEY_ALIAS }}
+      GODOT_ANDROID_KEYSTORE_RELEASE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+      ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: |
+            9.0.x
+            10.0.x
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '17'
+          server-id: github
+      - name: Check release signing
+        shell: bash
+        run: |
+          if [ -z "$ANDROID_KEYSTORE_BASE64" ] || [ -z "$GODOT_ANDROID_KEYSTORE_RELEASE_USER" ] || [ -z "$GODOT_ANDROID_KEYSTORE_RELEASE_PASSWORD" ]; then
+            echo 'Configure ANDROID_KEYSTORE_BASE64, ANDROID_KEY_ALIAS and ANDROID_KEYSTORE_PASSWORD repository secrets.' >&2
+            exit 1
+          fi
+          printf '%s' "$ANDROID_KEYSTORE_BASE64" | base64 --decode > "$GODOT_ANDROID_KEYSTORE_RELEASE_PATH"
+      - name: Set version
+        shell: bash
+        env:
+          INPUT_VERSION: ${{ inputs.version }}
+        run: |
+          if [ "$GITHUB_EVENT_NAME" = push ]; then VERSION="${GITHUB_REF_NAME#v}"; else VERSION="$INPUT_VERSION"; fi
+          python tools/set_android_version.py "$VERSION"
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+      - name: Install Android SDK components
+        run: |
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses >/dev/null || true
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" 'platform-tools' 'platforms;android-36' 'build-tools;36.0.0'
+      - name: Download Godot .NET and Android template
+        run: |
+          mkdir -p "$RUNNER_TEMP/godot" .godot
+          gh release download 4.7.2-stable --repo godotengine/godot-builds --pattern 'Godot_v4.7.2-stable_mono_linux_x86_64.zip' --dir "$RUNNER_TEMP/godot"
+          unzip -q "$RUNNER_TEMP/godot/Godot_v4.7.2-stable_mono_linux_x86_64.zip" -d "$RUNNER_TEMP/godot"
+          GODOT="$(find "$RUNNER_TEMP/godot" -type f -name 'Godot*linux.x86_64' -print -quit)"
+          test -n "$GODOT"
+          chmod +x "$GODOT"
+          echo "GODOT=$GODOT" >> "$GITHUB_ENV"
+          python tools/get_android_template.py .godot/android_release.apk
+      - name: Configure Godot Android SDK paths
+        run: |
+          mkdir -p "$HOME/.config/godot"
+          printf '[gd_resource type="EditorSettings" format=3]\n\n[resource]\nexport/android/java_sdk_path = "%s"\nexport/android/android_sdk_path = "%s"\n' "$JAVA_HOME" "$ANDROID_HOME" > "$HOME/.config/godot/editor_settings-4.7.tres"
+      - name: Import and export signed APK
+        run: |
+          dotnet build Exolon.csproj --configuration Debug
+          "$GODOT" --headless --path . --editor --import
+          mkdir -p build/android
+          "$GODOT" --headless --path . --export-release Android "build/android/Exolon-${VERSION}.apk"
+      - name: Verify APK signature and version
+        run: |
+          "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose "build/android/Exolon-${VERSION}.apk"
+          "$ANDROID_HOME/build-tools/36.0.0/aapt" dump badging "build/android/Exolon-${VERSION}.apk" | head -n 1 | grep -F "versionName='${VERSION}'"
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Exolon-Android-${{ env.VERSION }}
+          path: build/android/*.apk
+          if-no-files-found: error
+      - name: Publish version to GitHub Packages
+        run: |
+          mvn --batch-mode org.apache.maven.plugins:maven-deploy-plugin:3.1.4:deploy-file \
+            -Dfile="build/android/Exolon-${VERSION}.apk" \
+            -DgroupId=io.github.gagarinbefree -DartifactId=exolon-android \
+            -Dversion="$VERSION" -Dpackaging=apk -DgeneratePom=true \
+            -DrepositoryId=github -Durl="https://maven.pkg.github.com/${GITHUB_REPOSITORY}"

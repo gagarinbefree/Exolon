@@ -47,12 +47,12 @@ const fs = require('node:fs');
       await page.setViewportSize({ width, height });
       const bounds = await page.evaluate(() => {
         const rect = element => { const r = element.getBoundingClientRect(); return { x: r.x, y: r.y, width: r.width, height: r.height, right: r.right, bottom: r.bottom }; };
-        return { canvas: rect(document.querySelector('#canvas')), directions: rect(document.querySelector('#touch-directions')), fire: rect(document.querySelector('#touch-fire')), zones: [...document.querySelectorAll('.touch-zone')].map(element => ({ background: getComputedStyle(element).backgroundColor, label: getComputedStyle(element, '::after').content })) };
+        return { canvas: rect(document.querySelector('#canvas')), directions: rect(document.querySelector('#touch-directions')), fire: rect(document.querySelector('#touch-fire')), separator: getComputedStyle(document.querySelector('#touch-directions')).boxShadow, zones: [...document.querySelectorAll('.touch-zone')].map(element => ({ background: getComputedStyle(element).backgroundColor, label: getComputedStyle(element, '::after').content })) };
       });
       if (bounds.zones.some(zone => zone.background === 'rgba(0, 0, 0, 0)' || zone.label === 'none' || zone.label === '""')) throw new Error('Touch zone background or label is missing');
       if (width > height) {
-        if (bounds.fire.right > bounds.canvas.x + 1 || bounds.directions.x < bounds.canvas.right - 1 || Math.abs(bounds.directions.width / width - .3085) > .01) throw new Error('Landscape layout differs from the diagram');
-      } else if (bounds.directions.y < bounds.canvas.bottom - 1 || bounds.fire.y < bounds.canvas.bottom - 1 || bounds.fire.right > bounds.directions.x + 1 || Math.abs(bounds.directions.width / width - .707) > .01 || Math.abs(bounds.canvas.y + bounds.canvas.height / 2 - height / 2) > 1) throw new Error('Portrait layout differs from the diagram');
+        if (bounds.fire.right > bounds.canvas.x + 1 || bounds.directions.x < bounds.canvas.right - 1 || Math.abs(bounds.directions.width / width - .3085) > .01 || bounds.separator !== 'none') throw new Error('Landscape layout differs from the diagram');
+      } else if (bounds.directions.y < bounds.canvas.bottom - 1 || bounds.fire.y < bounds.canvas.bottom - 1 || bounds.fire.right > bounds.directions.x + 1 || Math.abs(bounds.directions.width / width - .707) > .01 || Math.abs(bounds.canvas.y + bounds.canvas.height / 2 - height / 2) > 1 || bounds.separator === 'none') throw new Error('Portrait layout differs from the diagram');
       for (const keys of zones) {
         await send('touchStart', [{ ...await point(keys), id: 1 }]);
         await assertHeld(keys.split(' '));
