@@ -14,6 +14,10 @@
 </p>
 
 <p align="center">
+  <img src="assets/images/screen.png" alt="Exolon loading screen artwork featuring Vitorc in his exoskeleton" width="512">
+</p>
+
+<p align="center">
   An in-progress Godot 4 / C# remake of the 1987 ZX Spectrum action game, based on the melonJS version of Exolon.
 </p>
 
