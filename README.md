@@ -30,7 +30,7 @@ Open `http://127.0.0.1:18765/` in a WebGL 2-compatible browser. GitHub Actions b
 
 The Android app has its own touch controls; the web controls and desktop keyboard controls remain independent. The [Android workflow](../../actions/workflows/android.yml) creates a signed release APK and publishes the version as the `io.github.gagarinbefree:exolon-android` Maven package in GitHub Packages. Run it manually with an `X.Y.Z` version, or push a matching `vX.Y.Z` tag. The APK is also available as a workflow artifact. GitHub's Maven registry requires authentication even for public packages.
 
-The workflow requires repository secrets `ANDROID_KEYSTORE_BASE64`, `ANDROID_KEY_ALIAS`, and `ANDROID_KEYSTORE_PASSWORD`. Keep a secure backup of the original release keystore and password: Android requires the same signing key for app updates. Android uses the official Godot 4.7.2 .NET 9 export template; the browser build continues to use .NET 10 and 2dog. The Android release template can be prepared with `python tools/get_android_template.py .godot/android_release.apk` before exporting the Android preset from Godot.
+The workflow requires repository secrets `ANDROID_KEYSTORE_BASE64`, `ANDROID_KEY_ALIAS`, and `ANDROID_KEYSTORE_PASSWORD`. Keep a secure backup of the original release keystore and password: Android requires the same signing key for app updates. Android uses the official Godot 4.7.2 .NET 9 export template; the browser build continues to use .NET 10 and 2dog. Before an Android export, run `python tools/get_android_template.py .godot/android_release.apk` and `python tools/prepare_android_project.py`. The latter restores the Android target override, which the 2dog importer removes when building for the web.
 
 ## Project layout
 

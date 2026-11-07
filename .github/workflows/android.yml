@@ -76,6 +76,7 @@ jobs:
         run: |
           dotnet build Exolon.csproj --configuration Debug
           "$GODOT" --headless --path . --editor --import
+          python tools/prepare_android_project.py
           mkdir -p build/android
           "$GODOT" --headless --path . --export-release Android "build/android/Exolon-${VERSION}.apk"
       - name: Verify APK signature and version
