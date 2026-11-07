@@ -37,7 +37,7 @@ const fs = require('node:fs');
     await send('touchEnd', [{ ...move, id: 1 }]);
     await send('touchEnd', []);
     await page.waitForTimeout(120);
-    const zones = ['ArrowUp ArrowLeft', 'ArrowUp', 'ArrowUp ArrowRight', 'ArrowLeft', 'ArrowRight', 'ArrowDown ArrowLeft', 'ArrowDown', 'ArrowDown ArrowRight'];
+    const zones = ['ArrowUp ArrowLeft', 'ArrowUp', 'ArrowUp ArrowRight', 'ArrowLeft', 'ArrowRight', 'ArrowDown'];
     for (const [width, height] of [[844, 390], [390, 844]]) {
       await page.setViewportSize({ width, height });
       const bounds = await page.evaluate(() => {
@@ -55,6 +55,17 @@ const fs = require('node:fs');
         await assertHeld([]);
         await page.waitForTimeout(120);
       }
+      for (const keys of ['ArrowLeft', 'ArrowRight']) {
+        const box = await page.locator(`[data-keys="${keys}"]`).boundingBox();
+        await send('touchStart', [{ x: Math.round(box.x + box.width / 2), y: Math.round(box.y + box.height * .9), id: 1 }]);
+        await assertHeld([keys]);
+        await send('touchEnd', []);
+        await page.waitForTimeout(120);
+      }
+      const up = await page.locator('[data-keys="ArrowUp"]').boundingBox();
+      const left = await page.locator('[data-keys="ArrowLeft"]').boundingBox();
+      const right = await page.locator('[data-keys="ArrowRight"]').boundingBox();
+      if (up.width >= left.width || up.width >= right.width || await page.locator('[data-keys^="ArrowDown "]').count()) throw new Error('Direction zones do not match the new diagram');
       const upLeft = await point('ArrowUp ArrowLeft');
       const upRight = await point('ArrowUp ArrowRight');
       const fire = await point('Space');

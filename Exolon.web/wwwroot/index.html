@@ -105,7 +105,7 @@
             #touch-directions {
                 right: 0; width: 70.7%;
                 display: grid;
-                grid-template-columns: 6fr 15fr 7fr;
+                grid-template-columns: 9fr 7fr 11fr;
                 grid-template-rows: 1fr 1.5fr 1.5fr 1fr;
             }
             .touch-zone {
@@ -120,11 +120,9 @@
             .touch-zone[data-keys="ArrowUp ArrowLeft"] { grid-area: 1 / 1; }
             .touch-zone[data-keys="ArrowUp"] { grid-area: 1 / 2 / 3 / 3; }
             .touch-zone[data-keys="ArrowUp ArrowRight"] { grid-area: 1 / 3; }
-            .touch-zone[data-keys="ArrowLeft"] { grid-area: 2 / 1 / 4 / 2; }
-            .touch-zone[data-keys="ArrowRight"] { grid-area: 2 / 3 / 4 / 4; }
-            .touch-zone[data-keys="ArrowDown ArrowLeft"] { grid-area: 4 / 1; }
+            .touch-zone[data-keys="ArrowLeft"] { grid-area: 2 / 1 / 5 / 2; }
+            .touch-zone[data-keys="ArrowRight"] { grid-area: 2 / 3 / 5 / 4; }
             .touch-zone[data-keys="ArrowDown"] { grid-area: 3 / 2 / 5 / 3; }
-            .touch-zone[data-keys="ArrowDown ArrowRight"] { grid-area: 4 / 3; }
             #touch-fire { left: 0; width: 29.3%; pointer-events: auto; }
         }
 
@@ -238,9 +236,7 @@
             <div class="touch-zone" data-keys="ArrowUp ArrowRight" data-label="↗"></div>
             <div class="touch-zone" data-keys="ArrowLeft" data-label="←"></div>
             <div class="touch-zone" data-keys="ArrowRight" data-label="→"></div>
-            <div class="touch-zone" data-keys="ArrowDown ArrowLeft" data-label="↙"></div>
             <div class="touch-zone" data-keys="ArrowDown" data-label="↓"></div>
-            <div class="touch-zone" data-keys="ArrowDown ArrowRight" data-label="↘"></div>
         </div>
         <div id="touch-fire" class="touch-area touch-zone" data-keys="Space" data-label="FIRE"></div>
     </div>
