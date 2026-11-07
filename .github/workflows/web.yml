@@ -36,6 +36,8 @@ jobs:
         run: node tools/web-smoke.cjs
       - name: Test touch controls
         run: node tools/web-touch-smoke.cjs
+      - name: Test PWA manifest
+        run: node tools/web-pwa-smoke.cjs
       - uses: actions/upload-artifact@v7
         if: always()
         with:

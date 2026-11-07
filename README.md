@@ -14,6 +14,8 @@ All 75 zones are enabled and available as editor previews. Gameplay has been che
 
 [Play Exolon in your browser](https://gagarinbefree.github.io/Exolon/).
 
+On Android, use your browser's **Install app** or **Add to Home screen** menu. On iPhone and iPad, open the page, tap **Share**, then **Add to Home Screen**. The installed app opens without browser chrome and requires an internet connection to play.
+
 The browser build runs the same Godot C# game using the experimental [2dog](https://github.com/outfox/2dog) WebAssembly host. It uses the single-threaded Compatibility renderer and does not require cross-origin isolation headers. To build and serve it locally, install the .NET 10 SDK and Python, then run:
 
 ```sh

@@ -5,6 +5,12 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Exolon</title>
+    <meta name="theme-color" content="#000000">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="Exolon">
+    <link rel="manifest" href="manifest.webmanifest">
+    <link rel="apple-touch-icon" href="pwa-180.png">
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <link rel="icon" type="image/png" sizes="96x96" href="favicon-96x96.png">
     <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
@@ -60,6 +66,18 @@
         }
 
         #touch-controls { display: none; }
+        #install-app {
+            position: fixed;
+            right: max(12px, env(safe-area-inset-right));
+            top: max(12px, env(safe-area-inset-top));
+            z-index: 3;
+            padding: 8px 14px;
+            border: 1px solid #e8d24c;
+            border-radius: 6px;
+            color: #fff;
+            background: #1a1a1a;
+            font: 600 14px system-ui, sans-serif;
+        }
 
         @media (pointer: coarse) {
             #canvas {
@@ -204,6 +222,7 @@
 </head>
 
 <body>
+    <button id="install-app" type="button" hidden>Install Exolon</button>
     <canvas id="canvas" width="512" height="384">
         Your browser does not support the canvas tag.
     </canvas>
@@ -230,8 +249,26 @@
         <div id="status-notice" role="alert"></div>
     </div>
 
+    <script>
+        let installPrompt;
+        const installButton = document.getElementById('install-app');
+        window.addEventListener('beforeinstallprompt', event => {
+            event.preventDefault();
+            installPrompt = event;
+            installButton.hidden = false;
+        });
+        installButton.addEventListener('click', async () => {
+            if (!installPrompt) return;
+            const prompt = installPrompt;
+            installPrompt = null;
+            installButton.hidden = true;
+            await prompt.prompt();
+        });
+        window.addEventListener('appinstalled', () => { installPrompt = null; installButton.hidden = true; });
+    </script>
     <script src="godot.js"></script>
     <script>
+
         // Forward independent pointers as the same keys used by the desktop game.
         // This permits holding movement and fire together, including grenade fire.
         const controls = document.getElementById('touch-controls');
