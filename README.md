@@ -4,20 +4,6 @@
 [![Play in browser](https://img.shields.io/badge/play-in%20browser-blue)](https://gagarinbefree.github.io/Exolon/)
 
 <p align="center">
-  <img src="Exolon.web/wwwroot/pwa-192.png" alt="Exolon app icon" width="112">
-</p>
-
-<h1 align="center">Exolon</h1>
-
-<p align="center">
-  <img src="assets/images/title.png" alt="Exolon" width="512">
-</p>
-
-<p align="center">
-  <img src="assets/images/screen.png" alt="Exolon loading screen artwork featuring Vitorc in his exoskeleton" width="512">
-</p>
-
-<p align="center">
   An in-progress Godot 4 / C# remake of the 1987 ZX Spectrum action game, based on the melonJS version of Exolon.
 </p>
 
@@ -25,6 +11,21 @@
   <a href="https://gagarinbefree.github.io/Exolon/"><strong>Play in your browser</strong></a>
   &nbsp; · &nbsp;
   <a href="https://github.com/gagarinbefree/Exolon/releases/latest"><strong>Download for Android</strong></a>
+</p>
+
+<table>
+  <tr>
+    <td align="center" valign="middle" width="75%"><h1>Exolon</h1></td>
+    <td align="center" valign="middle" width="25%"><img src="Exolon.web/wwwroot/pwa-192.png" alt="Exolon app icon" width="112"></td>
+  </tr>
+</table>
+
+<p align="center">
+  <img src="assets/images/title.png" alt="Exolon" width="512">
+</p>
+
+<p align="center">
+  <img src="assets/images/screen.png" alt="Exolon loading screen artwork featuring Vitorc in his exoskeleton" width="512">
 </p>
 
 ## Scenario
