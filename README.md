@@ -156,5 +156,4 @@ The structure of this guide follows the [original instructions](https://worldofs
 
 ## Links
 
-- [Exolon melonJS remake — newagebegins/exolon](https://github.com/newagebegins/exolon)
 - [Original Exolon — World of Spectrum](https://worldofspectrum.org/software?id=0001686)
