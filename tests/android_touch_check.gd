@@ -24,7 +24,7 @@ func run_check() -> void:
 		diagonal = Vector2(size.x * .74, size.y * .2)
 		fire = Vector2(size.x * .15, size.y * .5)
 	else:
-		var controls_top := size.y * .5 + size.x * .375
+		var controls_top := size.y * .5 + size.x * .375 + 20.0 * minf(size.x, size.y) / 390.0
 		diagonal = Vector2(size.x * .35, controls_top + (size.y - controls_top) * .2)
 		fire = Vector2(size.x * .15, controls_top + (size.y - controls_top) * .5)
 	send_touch(0, diagonal, true)

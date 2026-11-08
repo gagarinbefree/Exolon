@@ -39,12 +39,12 @@ Touch controls adapt to the orientation of your phone or tablet:
 
 <table>
   <tr>
-    <th>Landscape</th>
-    <th>Portrait</th>
+	<th>Landscape</th>
+	<th>Portrait</th>
   </tr>
   <tr>
-    <td align="center"><img src="docs/screenshots/touch-landscape.png" alt="Landscape browser game with touch controls beside the screen" width="600"></td>
-    <td align="center"><img src="docs/screenshots/touch-portrait.png" alt="Portrait browser game with touch controls below the screen" width="200"></td>
+	<td align="center"><img src="docs/screenshots/touch-landscape.png" alt="Landscape browser game with touch controls beside the screen" width="600"></td>
+	<td align="center"><img src="docs/screenshots/touch-portrait.png" alt="Portrait browser game with touch controls below the screen" width="200"></td>
   </tr>
 </table>
 
@@ -52,7 +52,7 @@ Touch controls adapt to the orientation of your phone or tablet:
 
 ### Browser and PWA
 
-Open **[Play Exolon](https://gagarinbefree.github.io/Exolon/)** in a browser with WebGL 2 support. Wait for the game to load, then press **Space** or tap **FIRE** on the title screen.
+Open **[Play Exolon](https://gagarinbefree.github.io/Exolon/)** in a browser with WebGL 2 support. Wait for the game to load, then press **Space** or tap the **crosshair** on the title screen.
 
 To add the game to your home screen:
 
@@ -86,9 +86,13 @@ Press **Space** on the title screen to start. Use **Up** while inside a teleport
 
 ### Touchscreen
 
-The **FIRE** area is on the left; the direction areas are on the right. Tap to fire or hold to launch a grenade. Touch a diagonal-up area to jump in that direction, and use a second finger to fire while moving.
+The **crosshair** (fire) area is on the left; the direction areas are on the right. Tap to fire or hold to launch a grenade. Touch a diagonal-up area to jump in that direction, and use a second finger to fire while moving.
 
 On a phone or tablet, controls appear below the game in portrait orientation and beside it in landscape orientation. The PWA and Android APK each provide their own touch controls; desktop play uses the keyboard. See the [control layout](docs/virtual_keyboard.txt) for the complete arrangement.
+
+### Updates
+
+Choose **CHECK FOR UPDATES** on the title screen with the direction controls and confirm with fire. If a newer version is available, choose **UPDATE** to reload the browser or installed PWA, or open the Android release page to download the new APK. Choose **CANCEL** to return to the menu.
 
 ## Playing the game
 

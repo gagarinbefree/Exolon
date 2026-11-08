@@ -50,14 +50,17 @@ public partial class AndroidControls : CanvasLayer
 		GetViewport().CanvasTransform = new Transform2D(0, new Vector2(scale, scale), 0, gameTopLeft);
 
 		Rect2 fire, directions;
+		// Match 20 CSS pixels at a typical phone width, scaling for physical pixels.
+		float gap = 20f * Mathf.Min(size.X, size.Y) / 390f;
 		if (landscape)
 		{
-			fire = new Rect2(0, 0, size.X * .3085f, size.Y);
-			directions = new Rect2(size.X * .6915f, 0, size.X * .3085f, size.Y);
+			float controlWidth = Mathf.Max(0, size.X * .3085f - gap);
+			fire = new Rect2(0, 0, controlWidth, size.Y);
+			directions = new Rect2(size.X - controlWidth, 0, controlWidth, size.Y);
 		}
 		else
 		{
-			float top = gameTopLeft.Y + gameSize.Y;
+			float top = Mathf.Min(size.Y, gameTopLeft.Y + gameSize.Y + gap);
 			fire = new Rect2(0, top, size.X * .293f, size.Y - top);
 			directions = new Rect2(size.X * .293f, top, size.X * .707f, size.Y - top);
 		}
@@ -121,14 +124,13 @@ public partial class AndroidControls : CanvasLayer
 		public AndroidControls OwnerControls = null!;
 		public override void _Draw()
 		{
-			Color background = new(1, 1, 1, .02f), label = new(1, 1, 1, .25f), line = new(1, 1, 1, .13f);
-			Font font = ThemeDB.FallbackFont;
-			int fontSize = Mathf.Clamp((int)(Size.X * .03f), 14, 24);
+			Color background = new(1, 1, 1, .02f), label = new(1, 1, 1, .4f), line = new(1, 1, 1, .13f);
+			float screenScale = Mathf.Min(Size.X, Size.Y) / 390f;
+			float iconSize = Mathf.Clamp(Size.X * .07f, 30f * screenScale, 56f * screenScale);
 			foreach (var zone in OwnerControls._zones)
 			{
 				DrawRect(zone.Rect, background);
-				Vector2 textSize = font.GetStringSize(zone.Label, HorizontalAlignment.Left, -1, fontSize);
-				DrawString(font, zone.Rect.GetCenter() + new Vector2(-textSize.X / 2, textSize.Y / 3), zone.Label, HorizontalAlignment.Left, -1, fontSize, label);
+				DrawIcon(zone.Rect.GetCenter(), iconSize, zone.Label, label);
 			}
 			// Draw only internal separators, never the exterior border.
 			for (int i = 1; i < OwnerControls._zones.Count; i++)
@@ -142,6 +144,30 @@ public partial class AndroidControls : CanvasLayer
 				Rect2 fire = OwnerControls._zones[0].Rect;
 				DrawLine(new Vector2(fire.End.X, fire.Position.Y), fire.End, line);
 			}
+		}
+
+		// Lucide/Feather crosshair and arrow-up, rotated for each direction.
+		private void DrawIcon(Vector2 center, float size, string icon, Color color)
+		{
+			float angle = icon switch { "↗" => Mathf.Pi / 4, "→" => Mathf.Pi / 2, "↓" => Mathf.Pi,
+				"←" => -Mathf.Pi / 2, "↖" => -Mathf.Pi / 4, _ => 0 };
+			float scale = size / 24f;
+			DrawSetTransform(center, angle, new Vector2(scale, scale));
+			if (icon == "FIRE")
+			{
+				DrawArc(Vector2.Zero, 8, 0, Mathf.Tau, 48, color, 2.5f, true);
+				DrawLine(new Vector2(0, -11), new Vector2(0, -5), color, 2.5f, true);
+				DrawLine(new Vector2(0, 5), new Vector2(0, 11), color, 2.5f, true);
+				DrawLine(new Vector2(-11, 0), new Vector2(-5, 0), color, 2.5f, true);
+				DrawLine(new Vector2(5, 0), new Vector2(11, 0), color, 2.5f, true);
+			}
+			else
+			{
+				DrawLine(new Vector2(0, 7), new Vector2(0, -7), color, 2.5f, true);
+				DrawLine(new Vector2(-7, 0), new Vector2(0, -7), color, 2.5f, true);
+				DrawLine(new Vector2(0, -7), new Vector2(7, 0), color, 2.5f, true);
+			}
+			DrawSetTransform(Vector2.Zero);
 		}
 	}
 }

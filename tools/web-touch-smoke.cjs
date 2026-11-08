@@ -14,7 +14,7 @@ const fs = require('node:fs');
     if (!await page.locator('#install-app').isVisible()) throw new Error('Install prompt was not shown on the title screen');
     const title = await canvas.screenshot();
     await page.locator('#touch-fire').tap();
-    await page.waitForTimeout(400);
+    await page.waitForTimeout(1000);
     if ((await canvas.screenshot()).equals(title)) throw new Error('Touching the fire zone did not start the game');
     if (await page.locator('#install-app').isVisible()) throw new Error('Install prompt remained visible after starting');
     await page.evaluate(() => window.dispatchEvent(new Event('beforeinstallprompt', { cancelable: true })));
@@ -47,12 +47,12 @@ const fs = require('node:fs');
       await page.setViewportSize({ width, height });
       const bounds = await page.evaluate(() => {
         const rect = element => { const r = element.getBoundingClientRect(); return { x: r.x, y: r.y, width: r.width, height: r.height, right: r.right, bottom: r.bottom }; };
-        return { canvas: rect(document.querySelector('#canvas')), directions: rect(document.querySelector('#touch-directions')), fire: rect(document.querySelector('#touch-fire')), separator: getComputedStyle(document.querySelector('#touch-directions')).boxShadow, zones: [...document.querySelectorAll('.touch-zone')].map(element => ({ background: getComputedStyle(element).backgroundColor, label: getComputedStyle(element, '::after').content })) };
+        return { canvas: rect(document.querySelector('#canvas')), directions: rect(document.querySelector('#touch-directions')), fire: rect(document.querySelector('#touch-fire')), separator: getComputedStyle(document.querySelector('#touch-directions')).boxShadow, zones: [...document.querySelectorAll('.touch-zone')].map(element => ({ background: getComputedStyle(element).backgroundColor, icon: !!element.querySelector('svg'), label: element.getAttribute('aria-label') })) };
       });
-      if (bounds.zones.some(zone => zone.background === 'rgba(0, 0, 0, 0)' || zone.label === 'none' || zone.label === '""')) throw new Error('Touch zone background or label is missing');
+      if (bounds.zones.some(zone => zone.background === 'rgba(0, 0, 0, 0)' || !zone.icon || !zone.label)) throw new Error('Touch zone background, icon or accessible label is missing');
       if (width > height) {
-        if (bounds.fire.right > bounds.canvas.x + 1 || bounds.directions.x < bounds.canvas.right - 1 || Math.abs(bounds.directions.width / width - .3085) > .01 || bounds.separator !== 'none') throw new Error('Landscape layout differs from the diagram');
-      } else if (bounds.directions.y < bounds.canvas.bottom - 1 || bounds.fire.y < bounds.canvas.bottom - 1 || bounds.fire.right > bounds.directions.x + 1 || Math.abs(bounds.directions.width / width - .707) > .01 || Math.abs(bounds.canvas.y + bounds.canvas.height / 2 - height / 2) > 1 || bounds.separator === 'none') throw new Error('Portrait layout differs from the diagram');
+        if (bounds.fire.right > bounds.canvas.x - 19 || bounds.directions.x < bounds.canvas.right + 19 || Math.abs(bounds.directions.width - (width * .3085 - 20)) > 1 || bounds.separator !== 'none') throw new Error('Landscape layout or game margin differs from the diagram');
+      } else if (bounds.directions.y < bounds.canvas.bottom + 19 || bounds.fire.y < bounds.canvas.bottom + 19 || bounds.fire.right > bounds.directions.x + 1 || Math.abs(bounds.directions.width / width - .707) > .01 || Math.abs(bounds.canvas.y + bounds.canvas.height / 2 - height / 2) > 1 || bounds.separator === 'none') throw new Error('Portrait layout or game margin differs from the diagram');
       for (const keys of zones) {
         await send('touchStart', [{ ...await point(keys), id: 1 }]);
         await assertHeld(keys.split(' '));

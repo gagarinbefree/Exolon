@@ -83,10 +83,16 @@ func run_check():
 	player.GrantInvulnerability(0.0)
 	await frames(3)
 	Input.action_press("ui_right")
-	for i in range(400):
+	for i in range(240):
 		await physics_frame
-		if player.IsDead: break
+		if player.IsDead or player.position.x >= 420: break
 	Input.action_release("ui_right")
+	# The piston starts after a random delay. Wait on it for a full cycle
+	# instead of walking past it and accidentally entering the next zone.
+	if not player.IsDead:
+		for i in range(420):
+			await physics_frame
+			if player.IsDead: break
 	print("Piston: player=", player.position, " rise=", world.TestPistonRise(), " dead=", player.IsDead)
 	if not player.IsDead or player.position.x < 405:
 		for i in range(player.get_slide_collision_count()):

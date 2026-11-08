@@ -98,7 +98,7 @@
             }
             .touch-area {
                 position: absolute;
-                top: calc(50dvh + 37.5vw);
+                top: calc(50dvh + 37.5vw + 20px);
                 bottom: 0;
                 touch-action: none; user-select: none; -webkit-user-select: none;
             }
@@ -113,10 +113,13 @@
                 display: grid; place-items: center;
                 background: rgba(255, 255, 255, .02);
                 box-sizing: border-box;
-                color: rgba(255, 255, 255, .25);
-                font: 600 clamp(14px, 3vw, 24px) system-ui, sans-serif;
+                color: rgba(255, 255, 255, .4);
+                font: 600 clamp(24px, 6vw, 48px) system-ui, sans-serif;
             }
-            .touch-zone::after { content: attr(data-label); pointer-events: none; }
+            .touch-zone svg {
+                width: clamp(30px, 7vw, 56px); height: clamp(30px, 7vw, 56px);
+                pointer-events: none; stroke: currentColor;
+            }
             .touch-zone[data-keys="ArrowUp ArrowLeft"] { grid-area: 1 / 1; }
             .touch-zone[data-keys="ArrowUp"] { grid-area: 1 / 2 / 3 / 3; }
             .touch-zone[data-keys="ArrowUp ArrowRight"] { grid-area: 1 / 3; }
@@ -144,7 +147,7 @@
                 width: min(38.3vw, calc(100dvh * 4 / 3)) !important;
             }
             .touch-area { top: 0; }
-            #touch-directions, #touch-fire { width: 30.85%; }
+            #touch-directions, #touch-fire { width: max(0px, calc(30.85% - 20px)); }
         }
 
         /* Painted above #status (which JavaScript would otherwise remove) so
@@ -242,14 +245,14 @@
 
     <div id="touch-controls" aria-label="Game controls">
         <div id="touch-directions" class="touch-area">
-            <div class="touch-zone" data-keys="ArrowUp ArrowLeft" data-label="↖"></div>
-            <div class="touch-zone" data-keys="ArrowUp" data-label="↑"></div>
-            <div class="touch-zone" data-keys="ArrowUp ArrowRight" data-label="↗"></div>
-            <div class="touch-zone" data-keys="ArrowLeft" data-label="←"></div>
-            <div class="touch-zone" data-keys="ArrowRight" data-label="→"></div>
-            <div class="touch-zone" data-keys="ArrowDown" data-label="↓"></div>
+            <div class="touch-zone" data-keys="ArrowUp ArrowLeft" aria-label="Jump left"></div>
+            <div class="touch-zone" data-keys="ArrowUp" aria-label="Up"></div>
+            <div class="touch-zone" data-keys="ArrowUp ArrowRight" aria-label="Jump right"></div>
+            <div class="touch-zone" data-keys="ArrowLeft" aria-label="Left"></div>
+            <div class="touch-zone" data-keys="ArrowRight" aria-label="Right"></div>
+            <div class="touch-zone" data-keys="ArrowDown" aria-label="Down"></div>
         </div>
-        <div id="touch-fire" class="touch-area touch-zone" data-keys="Space" data-label="FIRE"></div>
+        <div id="touch-fire" class="touch-area touch-zone" data-keys="Space" aria-label="Fire"></div>
     </div>
 
     <noscript>
@@ -279,12 +282,10 @@
             await prompt.prompt();
         });
         window.addEventListener('appinstalled', () => { installPrompt = null; installButton.hidden = true; });
-        window.addEventListener('keydown', event => {
-            if (event.code === 'Space' && !document.getElementById('status')) {
-                gameStarted = true;
-                installButton.hidden = true;
-            }
-        });
+        window.exolonGameStarted = () => {
+            gameStarted = true;
+            installButton.hidden = true;
+        };
     </script>
     <script src="godot.js"></script>
     <script>
@@ -293,6 +294,17 @@
         // This permits holding movement and fire together, including grenade fire.
         const controls = document.getElementById('touch-controls');
         const canvas = document.getElementById('canvas');
+        // Lucide/Feather icons; rotate the same arrow for all directions.
+        const arrowAngles = { 'ArrowUp': 0, 'ArrowUp ArrowRight': 45, 'ArrowRight': 90,
+            'ArrowDown': 180, 'ArrowLeft': -90, 'ArrowUp ArrowLeft': -45 };
+        for (const zone of controls.querySelectorAll('.touch-zone')) {
+            const fire = zone.dataset.keys === 'Space';
+            const shape = fire
+                ? '<circle cx="12" cy="12" r="8"/><path d="M12 1v6M12 17v6M1 12h6M17 12h6"/>'
+                : '<path d="M12 19V5M5 12l7-7 7 7"/>';
+            const angle = fire ? 0 : arrowAngles[zone.dataset.keys];
+            zone.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="transform:rotate(${angle}deg)">${shape}</svg>`;
+        }
         const activePointers = new Map();
         const capturedPointers = new Set();
         const keyCounts = new Map();

@@ -53,6 +53,8 @@ jobs:
         with:
           dotnet-version: 10.0.x
       - run: dotnet workload install wasm-tools
+      - name: Set build version
+        run: python tools/set_build_version.py "0.1.${GITHUB_RUN_NUMBER}"
       - name: Build desktop game
         run: dotnet build Exolon.csproj --configuration Debug
       - name: Publish browser game
@@ -67,6 +69,8 @@ jobs:
         run: node tools/web-smoke.cjs
       - name: Test touch controls
         run: node tools/web-touch-smoke.cjs
+      - name: Test web update check
+        run: node tools/web-update-smoke.cjs
       - name: Test PWA manifest
         run: node tools/web-pwa-smoke.cjs
       - uses: actions/upload-artifact@v7
@@ -136,6 +140,7 @@ jobs:
           VERSION="0.1.${GITHUB_RUN_NUMBER}"
           VERSION_CODE="$((1000 + GITHUB_RUN_NUMBER))"
           python tools/set_android_version.py "$VERSION" "$VERSION_CODE"
+          python tools/set_build_version.py "$VERSION"
           echo "VERSION=$VERSION" >> "$GITHUB_ENV"
           echo "VERSION_CODE=$VERSION_CODE" >> "$GITHUB_ENV"
       - name: Install Android SDK components
