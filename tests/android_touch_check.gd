@@ -21,8 +21,23 @@ func run_check() -> void:
 	var diagonal: Vector2
 	var fire: Vector2
 	if size.x > size.y:
-		diagonal = Vector2(size.x * .74, size.y * .2)
-		fire = Vector2(size.x * .15, size.y * .5)
+		var screen_scale := maxf(0.5, DisplayServer.screen_get_scale()) if OS.has_feature("android") else 1.0
+		var tablet := size.x / size.y <= 1.6
+		var gap := 20.0 * screen_scale
+		var fire_min := minf(120.0 * screen_scale, maxf(0.0, (size.x - 2.0 * gap) / 4.0)) if tablet else 80.0 * screen_scale
+		var game_min := minf(256.0 * screen_scale, maxf(0.0, (size.x - 2.0 * gap) / 3.0))
+		var directions_min := minf(280.0 * screen_scale, maxf(0.0, size.x - 2.0 * gap - fire_min - game_min)) if tablet else 80.0 * screen_scale
+		var available := maxf(0.0, size.x - fire_min - directions_min - 2.0 * gap)
+		var game_width := minf(available, size.y * 4.0 / 3.0)
+		var fire_width := fire_min + (available - game_width) / 2.0
+		var control_width := directions_min + (available - game_width) / 2.0
+		var transform := root.canvas_transform
+		if absf(transform.x.x * 512.0 - game_width) > 1.0 or absf(transform.origin.x - fire_width - gap) > 1.0:
+			push_error("Landscape game viewport did not preserve the control areas")
+			quit(1)
+			return
+		diagonal = Vector2(size.x - control_width + control_width / 6.0, size.y * .2)
+		fire = Vector2(fire_width / 2.0, size.y * .5)
 	else:
 		var controls_top := size.y * .5 + size.x * .375 + 20.0 * minf(size.x, size.y) / 390.0
 		diagonal = Vector2(size.x * .35, controls_top + (size.y - controls_top) * .2)

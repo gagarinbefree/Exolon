@@ -92,13 +92,13 @@ On a phone or tablet, controls appear below the game in portrait orientation and
 
 ### Updates
 
-Choose **CHECK FOR UPDATES** on the title screen with the direction controls and confirm with fire. If a newer version is available, choose **UPDATE** to reload the browser or installed PWA, or open the Android release page to download the new APK. Choose **CANCEL** to return to the menu.
+Choose **CHECK FOR UPDATES** on the title screen with the direction controls and confirm with fire. If a newer version is available, choose **UPDATE** to reload the browser or installed PWA, or start downloading the Android APK. Open the downloaded APK to install the update. Choose **CANCEL** to return to the menu.
 
 ## Playing the game
 
 ### Autosave
 
-The game automatically saves a checkpoint each time Vitorc enters a new zone. Select **CONTINUE** on the title screen or after Game Over to restart that zone with the lives, score, ammunition, grenades and armour recorded on entry. **PLAY** or **START AGAIN** starts a new game; the previous checkpoint remains available until another zone is reached.
+The game automatically saves a checkpoint each time Vitorc enters a new zone. Select **CONTINUE** on the title screen or after Game Over to restart that zone with the lives, score, ammunition, grenades and armour recorded on entry. **PLAY** or **START AGAIN** starts a new game; the previous checkpoint remains available until another zone is reached. After Game Over, **MAIN MENU** returns to the title screen.
 
 The checkpoint is stored locally on each device. Browser and PWA saves belong to that browser's site data; Android saves belong to the installed app. Clearing site data or uninstalling the Android app can remove the save, and saves do not sync between devices.
 

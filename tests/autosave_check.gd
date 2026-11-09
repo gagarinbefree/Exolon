@@ -77,6 +77,16 @@ func run_check() -> void:
 	if current_scene.TestAmmo() != 98 or current_scene.TestLives() != 8 or not current_scene.get_node("Player").IsArmored:
 		return fail("Game-over continue lost player state")
 
+	# Returning to the title must leave the checkpoint available.
+	change_scene_to_file("res://scenes/screens/game_over_menu.tscn")
+	await frames(5)
+	await press("ui_down")
+	await press("ui_down")
+	await press("fire")
+	await frames(8)
+	if current_scene.name != "TitleScreen" or save.load(save_path) != OK or save.get_value("checkpoint", "level") != "L01S03":
+		return fail("Main menu did not open with the checkpoint intact")
+
 	change_scene_to_file("res://scenes/screens/game_over_menu.tscn")
 	await frames(5)
 	await press("fire")
@@ -84,5 +94,5 @@ func run_check() -> void:
 	if current_scene.name != "FirstScreen" or current_scene.TestZone() != 0 or current_scene.TestAmmo() != 99:
 		return fail("Start again did not start a fresh game")
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(save_path))
-	print("PASS: checkpoints, replacement, title and game-over continue, and starting over")
+	print("PASS: checkpoints, continue, main menu and starting over")
 	quit()

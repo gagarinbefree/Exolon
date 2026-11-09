@@ -38,12 +38,16 @@ const fs = require('node:fs');
     await send('touchStart', [{ ...move, id: 1 }]);
     await send('touchStart', [{ ...move, id: 1 }, { ...shoot, id: 2 }]);
     await page.waitForTimeout(500);
-    if ((await page.screenshot({ clip: ammoClip })).equals(ammoBefore)) throw new Error('Fire zone did not consume ammunition');
+    if ((await page.screenshot({ clip: ammoClip })).equals(ammoBefore)) {
+      fs.mkdirSync('artifacts', { recursive: true });
+      await page.screenshot({ path: 'artifacts/web-touch-failure.png' });
+      throw new Error('Fire zone did not consume ammunition');
+    }
     await send('touchEnd', [{ ...move, id: 1 }]);
     await send('touchEnd', []);
     await page.waitForTimeout(120);
     const zones = ['ArrowUp ArrowLeft', 'ArrowUp', 'ArrowUp ArrowRight', 'ArrowLeft', 'ArrowRight', 'ArrowDown'];
-    for (const [width, height] of [[844, 390], [390, 844]]) {
+    for (const [width, height] of [[844, 390], [1024, 768], [390, 844]]) {
       await page.setViewportSize({ width, height });
       const bounds = await page.evaluate(() => {
         const rect = element => { const r = element.getBoundingClientRect(); return { x: r.x, y: r.y, width: r.width, height: r.height, right: r.right, bottom: r.bottom }; };
@@ -51,7 +55,16 @@ const fs = require('node:fs');
       });
       if (bounds.zones.some(zone => zone.background === 'rgba(0, 0, 0, 0)' || !zone.icon || !zone.label)) throw new Error('Touch zone background, icon or accessible label is missing');
       if (width > height) {
-        if (bounds.fire.right > bounds.canvas.x - 19 || bounds.directions.x < bounds.canvas.right + 19 || Math.abs(bounds.directions.width - (width * .3085 - 20)) > 1 || bounds.separator !== 'none') throw new Error('Landscape layout or game margin differs from the diagram');
+        const tablet = width / height <= 1.6;
+        const fireMin = tablet ? Math.min(120, Math.max(0, (width - 40) / 4)) : 80;
+        const gameMin = Math.min(256, Math.max(0, (width - 40) / 3));
+        const directionsMin = tablet ? Math.min(280, Math.max(0, width - 40 - fireMin - gameMin)) : 80;
+        const available = Math.max(0, width - fireMin - directionsMin - 40);
+        const gameWidth = Math.min(height * 4 / 3, available);
+        const expectedFire = fireMin + (available - gameWidth) / 2;
+        const expectedDirections = directionsMin + (available - gameWidth) / 2;
+        if (Math.abs(bounds.canvas.height - gameWidth * 3 / 4) > 1 || Math.abs(bounds.canvas.width - gameWidth) > 1 || Math.abs(bounds.fire.width - expectedFire) > 1 || Math.abs(bounds.directions.width - expectedDirections) > 1 || bounds.separator !== 'none') throw new Error('Landscape game or control size is incorrect');
+        if (bounds.fire.right > bounds.canvas.x - 19 || bounds.directions.x < bounds.canvas.right + 19) throw new Error('Landscape game margin is missing');
       } else if (bounds.directions.y < bounds.canvas.bottom + 19 || bounds.fire.y < bounds.canvas.bottom + 19 || bounds.fire.right > bounds.directions.x + 1 || Math.abs(bounds.directions.width / width - .707) > .01 || Math.abs(bounds.canvas.y + bounds.canvas.height / 2 - height / 2) > 1 || bounds.separator === 'none') throw new Error('Portrait layout or game margin differs from the diagram');
       for (const keys of zones) {
         await send('touchStart', [{ ...await point(keys), id: 1 }]);
@@ -71,6 +84,7 @@ const fs = require('node:fs');
       const left = await page.locator('[data-keys="ArrowLeft"]').boundingBox();
       const right = await page.locator('[data-keys="ArrowRight"]').boundingBox();
       if (up.width >= left.width || up.width >= right.width || await page.locator('[data-keys^="ArrowDown "]').count()) throw new Error('Direction zones do not match the new diagram');
+      if (width === 1024 && height === 768 && up.width < 70) throw new Error('Tablet direction buttons are too narrow');
       const diagonal = await page.locator('[data-keys="ArrowUp ArrowLeft"]').boundingBox();
       if (Math.abs(diagonal.height / bounds.directions.height - .4) > .01) throw new Error('Upper diagonal zones should occupy 40% of the height');
       const borders = await page.evaluate(() => [...document.querySelectorAll('.touch-zone')].map(element => {
@@ -89,7 +103,8 @@ const fs = require('node:fs');
       await send('touchEnd', []);
       await assertHeld([]);
       fs.mkdirSync('artifacts', { recursive: true });
-      await page.screenshot({ path: `artifacts/web-touch-${width > height ? 'landscape' : 'portrait'}.png` });
+      const orientation = width > height ? (width === 844 ? 'landscape' : 'landscape-tablet') : 'portrait';
+      await page.screenshot({ path: `artifacts/web-touch-${orientation}.png` });
       await page.waitForTimeout(120);
     }
     if (errors.length) throw new Error(errors.join('\n'));

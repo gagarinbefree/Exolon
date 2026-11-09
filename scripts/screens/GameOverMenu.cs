@@ -15,12 +15,18 @@ public partial class GameOverMenu : Node2D
 	public override void _PhysicsProcess(double delta)
 	{
 		bool fire = Input.IsActionJustPressed("fire");
-		if (!fire && _hasSave && (Input.IsActionJustPressed("ui_up") || Input.IsActionJustPressed("ui_down")))
+		if (!fire && (Input.IsActionJustPressed("ui_up") || Input.IsActionJustPressed("ui_down")))
 		{
-			_selection = 1 - _selection;
+			int count = _hasSave ? 3 : 2;
+			_selection = (_selection + (Input.IsActionJustPressed("ui_up") ? -1 : 1) + count) % count;
 			QueueRedraw();
 		}
 		if (!fire) return;
+		if (_selection == (_hasSave ? 2 : 1))
+		{
+			GetTree().ChangeSceneToFile("res://scenes/screens/title_screen.tscn");
+			return;
+		}
 		if (_selection == 0) AutoSave.StartNew();
 		else if (!AutoSave.PrepareContinue()) { _hasSave = false; _selection = 0; QueueRedraw(); return; }
 		GetTree().ChangeSceneToFile("res://scenes/screens/first_screen.tscn");
@@ -31,8 +37,9 @@ public partial class GameOverMenu : Node2D
 		DrawRect(new Rect2(0, 0, 512, 384), Colors.Black);
 		DrawTexture(GD.Load<Texture2D>("res://assets/images/title.png"), new Vector2(128, 0));
 		DrawText("red", "GAME OVER", 128);
-		DrawOption("START AGAIN", _hasSave ? 200 : 220, _selection == 0);
-		if (_hasSave) DrawOption("CONTINUE", 240, _selection == 1);
+		DrawOption("START AGAIN", _hasSave ? 176 : 200, _selection == 0);
+		if (_hasSave) DrawOption("CONTINUE", 216, _selection == 1);
+		DrawOption("MAIN MENU", _hasSave ? 256 : 240, _selection == (_hasSave ? 2 : 1));
 		DrawText("green", "UP DOWN + FIRE", 304);
 	}
 

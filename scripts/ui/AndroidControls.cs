@@ -43,20 +43,32 @@ public partial class AndroidControls : CanvasLayer
 		Vector2 size = GetViewport().GetVisibleRect().Size;
 		if (size.X <= 0 || size.Y <= 0) return;
 		bool landscape = size.X > size.Y;
-		float gameWidth = landscape ? Mathf.Min(size.X * .383f, size.Y * 4f / 3f) : size.X;
+		// Reserve an accessible control strip and the gap on each side.
+		float screenScale = landscape
+			? (OS.HasFeature("android") ? Mathf.Max(.5f, DisplayServer.ScreenGetScale()) : 1f)
+			: Mathf.Min(size.X, size.Y) / 390f;
+		float gap = 20f * screenScale;
+		bool tabletLayout = landscape && size.X / size.Y <= 1.6f;
+		float fireMinimum = tabletLayout ? Mathf.Min(120f * screenScale, Mathf.Max(0, (size.X - 2f * gap) / 4f)) : 80f * screenScale;
+		float gameMinimum = Mathf.Min(256f * screenScale, Mathf.Max(0, (size.X - 2f * gap) / 3f));
+		float directionsMinimum = tabletLayout ? Mathf.Min(280f * screenScale, Mathf.Max(0, size.X - 2f * gap - fireMinimum - gameMinimum)) : 80f * screenScale;
+		float availableGameWidth = Mathf.Max(0, size.X - fireMinimum - directionsMinimum - 2f * gap);
+		float gameWidth = landscape ? Mathf.Min(availableGameWidth, size.Y * 4f / 3f) : size.X;
 		float scale = gameWidth / 512f;
 		Vector2 gameSize = new(gameWidth, 384f * scale);
-		Vector2 gameTopLeft = (size - gameSize) / 2f;
+		float extraSpace = Mathf.Max(0, availableGameWidth - gameWidth);
+		Vector2 gameTopLeft = landscape
+			? new Vector2(fireMinimum + extraSpace / 2f + gap, (size.Y - gameSize.Y) / 2f)
+			: (size - gameSize) / 2f;
 		GetViewport().CanvasTransform = new Transform2D(0, new Vector2(scale, scale), 0, gameTopLeft);
 
 		Rect2 fire, directions;
-		// Match 20 CSS pixels at a typical phone width, scaling for physical pixels.
-		float gap = 20f * Mathf.Min(size.X, size.Y) / 390f;
 		if (landscape)
 		{
-			float controlWidth = Mathf.Max(0, size.X * .3085f - gap);
-			fire = new Rect2(0, 0, controlWidth, size.Y);
-			directions = new Rect2(size.X - controlWidth, 0, controlWidth, size.Y);
+			float fireWidth = Mathf.Max(0, gameTopLeft.X - gap);
+			float directionsWidth = Mathf.Max(0, size.X - gameTopLeft.X - gameSize.X - gap);
+			fire = new Rect2(0, 0, fireWidth, size.Y);
+			directions = new Rect2(size.X - directionsWidth, 0, directionsWidth, size.Y);
 		}
 		else
 		{
@@ -130,7 +142,8 @@ public partial class AndroidControls : CanvasLayer
 			foreach (var zone in OwnerControls._zones)
 			{
 				DrawRect(zone.Rect, background);
-				DrawIcon(zone.Rect.GetCenter(), iconSize, zone.Label, label);
+				float fittedSize = Mathf.Min(iconSize, Mathf.Min(zone.Rect.Size.X, zone.Rect.Size.Y) * .8f);
+				if (fittedSize > 0) DrawIcon(zone.Rect.GetCenter(), fittedSize, zone.Label, label);
 			}
 			// Draw only internal separators, never the exterior border.
 			for (int i = 1; i < OwnerControls._zones.Count; i++)

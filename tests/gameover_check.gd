@@ -51,6 +51,20 @@ func run_check():
 		push_error("Fire did not start a new game")
 		quit(1)
 		return
+	change_scene_to_file("res://scenes/screens/game_over_menu.tscn")
+	for i in range(3): await physics_frame
+	Input.action_press("ui_up")
+	for i in range(3): await physics_frame
+	Input.action_release("ui_up")
+	for i in range(3): await physics_frame
+	Input.action_press("fire")
+	for i in range(3): await physics_frame
+	Input.action_release("fire")
+	for i in range(3): await physics_frame
+	if not current_scene or current_scene.name != "TitleScreen":
+		push_error("Main menu did not open")
+		quit(1)
+		return
 	print("PASS: nine deaths, game over menu and restart")
 	Engine.time_scale = 1.0
 	quit(0)

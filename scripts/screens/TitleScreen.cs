@@ -3,7 +3,7 @@ using System;
 
 public partial class TitleScreen : Node2D
 {
-	private const string ReleaseUrl = "https://github.com/gagarinbefree/Exolon/releases/latest";
+	private const string ReleaseDownloadRoot = "https://github.com/gagarinbefree/Exolon/releases/download/";
 	private const string ApiUrl = "https://api.github.com/repos/gagarinbefree/Exolon/releases/latest";
 	private AudioStreamPlayer _audio = null!;
 	private HttpRequest? _request;
@@ -11,6 +11,7 @@ public partial class TitleScreen : Node2D
 	private int _selection;
 	private string _status = "";
 	private string _latest = "";
+	private string _downloadUrl = "";
 	private bool _updateAvailable;
 	private bool _hasSave;
 
@@ -59,6 +60,7 @@ public partial class TitleScreen : Node2D
 		_updateAvailable = false;
 		_selection = 1;
 		_latest = "";
+		_downloadUrl = "";
 		_status = "CHECKING...";
 		QueueRedraw();
 		if (!OS.HasFeature("web") && !OS.HasFeature("android"))
@@ -98,6 +100,19 @@ public partial class TitleScreen : Node2D
 			return;
 		}
 		_updateAvailable = latest > installed;
+		if (_updateAvailable && OS.HasFeature("android"))
+		{
+			_downloadUrl = AndroidApkUrl(data, _latest);
+			if (_downloadUrl == "")
+			{
+				_updateAvailable = false;
+				_status = "UPDATE FILE NOT FOUND";
+				_selection = 1;
+				ClearRequest();
+				QueueRedraw();
+				return;
+			}
+		}
 		_status = _updateAvailable ? "UPDATE AVAILABLE" : "YOU ARE UP TO DATE";
 		_selection = _updateAvailable ? 0 : 1;
 		ClearRequest();
@@ -125,10 +140,40 @@ public partial class TitleScreen : Node2D
 		QueueRedraw();
 	}
 
-	private static void ApplyUpdate()
+	private void ApplyUpdate()
 	{
 		if (OS.HasFeature("web")) JavaScriptBridge.Eval("location.reload()", true);
-		else OS.ShellOpen(ReleaseUrl);
+		else if (OS.ShellOpen(_downloadUrl) != Error.Ok)
+		{
+			_status = "DOWNLOAD FAILED";
+			QueueRedraw();
+		}
+	}
+
+	// Only open the APK belonging to the version reported by our release.
+	private static string AndroidApkUrl(Godot.Collections.Dictionary release, string version)
+	{
+		if (!Version.TryParse(version, out Version? parsed) || parsed.Build < 0 || parsed.Revision >= 0 ||
+			version != parsed.ToString(3) || !release.ContainsKey("tag_name") ||
+			release["tag_name"].AsString() != "v" + version ||
+			!release.ContainsKey("assets") || release["assets"].VariantType != Variant.Type.Array) return "";
+		string name = $"Exolon-{version}.apk";
+		string expectedUrl = $"{ReleaseDownloadRoot}v{version}/{name}";
+		foreach (Variant item in release["assets"].AsGodotArray())
+		{
+			if (item.VariantType != Variant.Type.Dictionary) continue;
+			var asset = item.AsGodotDictionary();
+			if (asset.ContainsKey("name") && asset.ContainsKey("browser_download_url") &&
+				asset["name"].AsString() == name && asset["browser_download_url"].AsString() == expectedUrl)
+				return expectedUrl;
+		}
+		return "";
+	}
+
+	public string TestAndroidApkUrl(string releaseJson, string version)
+	{
+		Variant release = Json.ParseString(releaseJson);
+		return release.VariantType == Variant.Type.Dictionary ? AndroidApkUrl(release.AsGodotDictionary(), version) : "";
 	}
 
 	public override void _Draw()
