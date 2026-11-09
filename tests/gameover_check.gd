@@ -35,14 +35,14 @@ func run_check():
 		root.get_texture().get_image().save_png("user://gameover_check.png")
 	for i in range(400):
 		await process_frame
-		if current_scene and current_scene.name == "TitleScreen": break
-	if not current_scene or current_scene.name != "TitleScreen":
-		push_error("Title screen did not open")
+		if current_scene and current_scene.name == "GameOverMenu": break
+	if not current_scene or current_scene.name != "GameOverMenu":
+		push_error("Game-over menu did not open")
 		quit(1)
 		return
 	if DisplayServer.get_name() != "headless":
 		await RenderingServer.frame_post_draw
-		root.get_texture().get_image().save_png("user://title_check.png")
+		root.get_texture().get_image().save_png("user://gameover_menu_check.png")
 	Input.action_press("fire")
 	await process_frame
 	await process_frame
@@ -51,6 +51,6 @@ func run_check():
 		push_error("Fire did not start a new game")
 		quit(1)
 		return
-	print("PASS: nine deaths, game over, title screen and restart")
+	print("PASS: nine deaths, game over menu and restart")
 	Engine.time_scale = 1.0
 	quit(0)

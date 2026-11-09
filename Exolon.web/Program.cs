@@ -19,7 +19,7 @@ internal static class Program
         {
             engine.Start();
             GD.Print("2dog is running in the browser!");
-            GD.Print("Scene Root: ", engine.Tree.CurrentScene.Name);
+            GD.Print("Scene Root: ", engine.Tree.CurrentScene?.Name ?? "<none>");
             // The browser loop owns the lifetime after Run() returns.
             engine.Run();
         }

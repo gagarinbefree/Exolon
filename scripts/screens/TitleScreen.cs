@@ -12,9 +12,11 @@ public partial class TitleScreen : Node2D
 	private string _status = "";
 	private string _latest = "";
 	private bool _updateAvailable;
+	private bool _hasSave;
 
 	public override void _Ready()
 	{
+		_hasSave = AutoSave.HasSave();
 		_audio = new AudioStreamPlayer { Stream = GD.Load<AudioStream>("res://assets/sound/theme.ogg") };
 		AddChild(_audio);
 		_audio.Play();
@@ -31,14 +33,17 @@ public partial class TitleScreen : Node2D
 		bool firePressed = Input.IsActionJustPressed("fire");
 		if (!firePressed && (Input.IsActionJustPressed("ui_up") || Input.IsActionJustPressed("ui_down")))
 		{
-			if (!_updatesScreen || _updateAvailable) _selection = 1 - _selection;
+			if (!_updatesScreen) _selection = (_selection + (Input.IsActionJustPressed("ui_up") ? -1 : 1) + (_hasSave ? 3 : 2)) % (_hasSave ? 3 : 2);
+			else if (_updateAvailable) _selection = 1 - _selection;
 			QueueRedraw();
 		}
 		if (!firePressed) return;
 		if (!_updatesScreen)
 		{
-			if (_selection == 0)
+			if (_selection == 0 || (_hasSave && _selection == 1))
 			{
+				if (_selection == 0) AutoSave.StartNew();
+				else if (!AutoSave.PrepareContinue()) { _hasSave = false; _selection = 0; QueueRedraw(); return; }
 				if (OS.HasFeature("web")) JavaScriptBridge.Eval("window.exolonGameStarted?.()", true);
 				GetTree().ChangeSceneToFile("res://scenes/screens/first_screen.tscn");
 			}
@@ -116,7 +121,7 @@ public partial class TitleScreen : Node2D
 	{
 		ClearRequest();
 		_updatesScreen = false;
-		_selection = 1;
+		_selection = _hasSave ? 2 : 1;
 		QueueRedraw();
 	}
 
@@ -133,8 +138,9 @@ public partial class TitleScreen : Node2D
 		DrawText("green", "BY  RAFFAELE CECCO", 112, 96);
 		if (!_updatesScreen)
 		{
-			DrawOption("PLAY", 184, _selection == 0);
-			DrawOption("CHECK FOR UPDATES", 224, _selection == 1);
+			DrawOption("PLAY", _hasSave ? 168 : 184, _selection == 0);
+			if (_hasSave) DrawOption("CONTINUE", 208, _selection == 1);
+			DrawOption("CHECK FOR UPDATES", _hasSave ? 248 : 224, _selection == (_hasSave ? 2 : 1));
 			DrawText("green", "UP DOWN + FIRE", 144, 288);
 		}
 		else

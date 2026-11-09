@@ -84,6 +84,7 @@ public partial class FirstScreen : Node2D
 	private bool _awaitFireRelease;
 	private bool _gameOver;
 	private float _gameOverTime;
+	private string _currentLevel = "";
 	private int _zone;
 	private string _nextLevel = "";
 	private bool _transitionPending;
@@ -193,10 +194,21 @@ public partial class FirstScreen : Node2D
 		AddChild(new MapObjectView { Name = "EnemyExplosions", ZIndex = PlayerZ + 1, DrawObject = target => DrawEffects(target, "circular_explosion") });
 		AddChild(new MapObjectView { Name = "ExplosionParticles", ZIndex = 3800, DrawObject = target => DrawEffects(target, "explosion_particle") });
 		AddChild(new MapObjectView { Name = "HUD", ZIndex = 3900, DrawObject = DrawHud });
-		_zone = InitialZoneCount;
+		AutoSave.Checkpoint? checkpoint = Engine.IsEditorHint() ? null : AutoSave.Consume();
+		_zone = checkpoint?.Zone ?? InitialZoneCount;
+		if (checkpoint != null)
+		{
+			_ammo = checkpoint.Ammo; _grenades = checkpoint.Grenades;
+			_lives = checkpoint.Lives; _points = checkpoint.Points;
+		}
 		_awaitFireRelease = Input.IsActionPressed("fire");
-		LoadMap(InitialLevel);
+		LoadMap(checkpoint?.Level ?? InitialLevel);
 		if (Engine.IsEditorHint()) { QueueRedraw(); return; }
+		if (checkpoint != null)
+		{
+			_player.Position = new Vector2(_player.Position.X, checkpoint.Y);
+			if (checkpoint.Armored) _player.ToggleOutfit();
+		}
 		_player.CanLeaveScreen = LevelMap.Exists(_nextLevel) && LevelMap.CanEnter(_nextLevel);
 		QueueRedraw();
 	}
@@ -222,6 +234,7 @@ public partial class FirstScreen : Node2D
 
 	private void LoadMap(string level)
 	{
+		_currentLevel = level;
 		LevelMap map = LevelMap.Load(level);
 		_dynamicView.ZIndex = PlayerZ + map.DynamicDrawOrder;
 		_nextLevel = map.NextLevel;
@@ -355,7 +368,7 @@ public partial class FirstScreen : Node2D
 		if (_gameOver)
 		{
 			_gameOverTime += dt;
-			if (_gameOverTime >= 4f) GetTree().ChangeSceneToFile("res://scenes/screens/title_screen.tscn");
+			if (_gameOverTime >= 4f) GetTree().ChangeSceneToFile("res://scenes/screens/game_over_menu.tscn");
 			return;
 		}
 		bool completing = _completeWindow != null;
@@ -459,6 +472,7 @@ public partial class FirstScreen : Node2D
 		LoadMap(_nextLevel);
 		_newLevelAfterBonus = false;
 		_player.CanLeaveScreen = LevelMap.Exists(_nextLevel) && LevelMap.CanEnter(_nextLevel);
+		AutoSave.Save(new AutoSave.Checkpoint(_currentLevel, _zone, _ammo, _grenades, _lives, _points, _player.IsArmored, _player.Position.Y));
 		_transitionPending = false;
 		QueueRedraw();
 	}

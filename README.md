@@ -96,6 +96,12 @@ Choose **CHECK FOR UPDATES** on the title screen with the direction controls and
 
 ## Playing the game
 
+### Autosave
+
+The game automatically saves a checkpoint each time Vitorc enters a new zone. Select **CONTINUE** on the title screen or after Game Over to restart that zone with the lives, score, ammunition, grenades and armour recorded on entry. **PLAY** or **START AGAIN** starts a new game; the previous checkpoint remains available until another zone is reached.
+
+The checkpoint is stored locally on each device. Browser and PWA saves belong to that browser's site data; Android saves belong to the installed app. Clearing site data or uninstalling the Android app can remove the save, and saves do not sync between devices.
+
 ### Blaster
 
 A short press fires the hand blaster. Use it against alien creatures and other vulnerable targets. Keep an eye on the **AMMO** counter; ammunition packs refill it.

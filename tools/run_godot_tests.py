@@ -1,11 +1,13 @@
 """Run every Godot scenario in isolation, including render-dependent checks."""
 import argparse
 import concurrent.futures
+import os
 import pathlib
 import re
 import subprocess
 import sys
 import time
+import uuid
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 VISUAL = {
@@ -34,8 +36,14 @@ if not selected:
     raise SystemExit("No scenarios found")
 log_dir = ROOT / "artifacts" / "godot-test-logs"
 log_dir.mkdir(parents=True, exist_ok=True)
+save_dir = ROOT / "artifacts" / "godot-test-saves"
+save_dir.mkdir(parents=True, exist_ok=True)
 
 def run(test):
+    # Each scenario gets an isolated checkpoint; never overwrite the player's save.
+    save_path = save_dir / (test.stem + "-" + uuid.uuid4().hex + ".cfg")
+    environment = os.environ.copy()
+    environment["EXOLON_SAVE_PATH"] = str(save_path)
     command = [args.godot, "--path", str(ROOT), "--fixed-fps", "60", "--audio-driver", "Dummy",
                "--log-file", str(log_dir / (test.stem + ".log"))]
     if args.group == "logic":
@@ -46,9 +54,12 @@ def run(test):
     start = time.monotonic()
     try:
         result = subprocess.run(command, cwd=ROOT, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-                                text=True, encoding="utf-8", errors="replace", timeout=args.timeout)
+                                text=True, encoding="utf-8", errors="replace", timeout=args.timeout, env=environment)
     except subprocess.TimeoutExpired as error:
         return test.name, False, time.monotonic() - start, f"Timed out after {args.timeout}s\n{error.stdout or ''}"
+    finally:
+        save_path.unlink(missing_ok=True)
+        pathlib.Path(str(save_path) + ".tmp").unlink(missing_ok=True)
     output = result.stdout
     errors = [line for line in output.splitlines() if "ERROR:" in line and not re.search(r"ERROR: \d+ resources still in use at exit", line)]
     ok = result.returncode == 0 and not errors
