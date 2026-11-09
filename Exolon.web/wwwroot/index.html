@@ -143,27 +143,27 @@
 
         @media (pointer: coarse) and (orientation: landscape) {
             :root {
-                --landscape-fire-min: 80px;
-                --landscape-directions-min: 80px;
-                --landscape-game-width: min(calc(100dvh * 4 / 3), max(0px, calc(100vw - var(--landscape-fire-min) - var(--landscape-directions-min) - 40px)));
+                --landscape-control-target: 160px;
+                --landscape-game-min: min(256px, max(0px, calc((100vw - 40px) / 3)));
+                --landscape-control-min: min(var(--landscape-control-target), max(0px, calc(100vw - 40px - var(--landscape-game-min))));
+                --landscape-game-width: min(calc(100dvh * 4 / 3), max(0px, calc(100vw - var(--landscape-control-min) - 40px)));
+                --landscape-controls-width: max(0px, calc(100vw - var(--landscape-game-width) - 40px));
+                --landscape-fire-width: calc(var(--landscape-controls-width) / 10 * 3);
+                --landscape-directions-width: calc(var(--landscape-controls-width) - var(--landscape-fire-width));
             }
             #canvas {
                 top: 50%;
-                left: calc(50vw + (var(--landscape-fire-min) - var(--landscape-directions-min)) / 2);
+                left: calc(var(--landscape-fire-width) + 20px + var(--landscape-game-width) / 2);
                 transform: translate(-50%, -50%);
                 width: var(--landscape-game-width) !important;
             }
             .touch-area { top: 0; }
-            #touch-fire { width: max(0px, calc((100vw - var(--landscape-game-width) + var(--landscape-fire-min) - var(--landscape-directions-min)) / 2 - 20px)); }
-            #touch-directions { width: max(0px, calc((100vw - var(--landscape-game-width) - var(--landscape-fire-min) + var(--landscape-directions-min)) / 2 - 20px)); }
+            #touch-fire { width: var(--landscape-fire-width); }
+            #touch-directions { width: var(--landscape-directions-width); }
         }
 
         @media (pointer: coarse) and (orientation: landscape) and (max-aspect-ratio: 8/5) {
-            :root {
-                --landscape-fire-min: min(120px, calc((100vw - 40px) / 4));
-                --landscape-game-min: min(256px, calc((100vw - 40px) / 3));
-                --landscape-directions-min: min(280px, max(0px, calc(100vw - 40px - var(--landscape-fire-min) - var(--landscape-game-min))));
-            }
+            :root { --landscape-control-target: 400px; }
         }
 
         /* Painted above #status (which JavaScript would otherwise remove) so

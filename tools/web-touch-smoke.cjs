@@ -56,15 +56,16 @@ const fs = require('node:fs');
       if (bounds.zones.some(zone => zone.background === 'rgba(0, 0, 0, 0)' || !zone.icon || !zone.label)) throw new Error('Touch zone background, icon or accessible label is missing');
       if (width > height) {
         const tablet = width / height <= 1.6;
-        const fireMin = tablet ? Math.min(120, Math.max(0, (width - 40) / 4)) : 80;
         const gameMin = Math.min(256, Math.max(0, (width - 40) / 3));
-        const directionsMin = tablet ? Math.min(280, Math.max(0, width - 40 - fireMin - gameMin)) : 80;
-        const available = Math.max(0, width - fireMin - directionsMin - 40);
+        const controlMin = Math.min(tablet ? 400 : 160, Math.max(0, width - 40 - gameMin));
+        const available = Math.max(0, width - controlMin - 40);
         const gameWidth = Math.min(height * 4 / 3, available);
-        const expectedFire = fireMin + (available - gameWidth) / 2;
-        const expectedDirections = directionsMin + (available - gameWidth) / 2;
+        const controlsWidth = width - gameWidth - 40;
+        const expectedFire = controlsWidth * 0.3;
+        const expectedDirections = controlsWidth * 0.7;
         if (Math.abs(bounds.canvas.height - gameWidth * 3 / 4) > 1 || Math.abs(bounds.canvas.width - gameWidth) > 1 || Math.abs(bounds.fire.width - expectedFire) > 1 || Math.abs(bounds.directions.width - expectedDirections) > 1 || bounds.separator !== 'none') throw new Error('Landscape game or control size is incorrect');
         if (bounds.fire.right > bounds.canvas.x - 19 || bounds.directions.x < bounds.canvas.right + 19) throw new Error('Landscape game margin is missing');
+        if (bounds.directions.width <= bounds.fire.width * 2) throw new Error('Direction area should be wider than the fire area');
       } else if (bounds.directions.y < bounds.canvas.bottom + 19 || bounds.fire.y < bounds.canvas.bottom + 19 || bounds.fire.right > bounds.directions.x + 1 || Math.abs(bounds.directions.width / width - .707) > .01 || Math.abs(bounds.canvas.y + bounds.canvas.height / 2 - height / 2) > 1 || bounds.separator === 'none') throw new Error('Portrait layout or game margin differs from the diagram');
       for (const keys of zones) {
         await send('touchStart', [{ ...await point(keys), id: 1 }]);
