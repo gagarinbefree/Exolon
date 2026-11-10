@@ -73,22 +73,22 @@ Open `project.godot` in Godot 4.7.2 .NET, build the C# project with the .NET 10 
 
 ## Controls
 
-### Keyboard
+### Keyboard and mouse
 
 | Key | Action |
 | --- | --- |
-| Left / Right | Walk |
-| Up | Jump, use a teleport or enter an armour capsule |
-| Down | Duck |
-| Space | Fire the blaster; hold to launch a grenade |
+| A / D or Left / Right | Walk |
+| W or Up | Jump, use a teleport or enter an armour capsule |
+| S or Down | Duck |
+| Space or left mouse button | Fire the blaster; hold to launch a grenade |
 
-Press **Space** on the title screen to start. Use **Up** while inside a teleport or armour capsule to activate it. Press fire again on the bonus screen to stop the pointer.
+Press **Space** or the **left mouse button** on the title screen to start. Use **W** or **Up** while inside a teleport or armour capsule to activate it. Press fire again on the bonus screen to stop the pointer.
 
 ### Touchscreen
 
 The **crosshair** (fire) area is on the left; the direction areas are on the right. Tap to fire or hold to launch a grenade. Touch a diagonal-up area to jump in that direction, and use a second finger to fire while moving.
 
-On a phone or tablet, controls appear below the game in portrait orientation and beside it in landscape orientation. The PWA and Android APK each provide their own touch controls; desktop play uses the keyboard. See the [control layout](docs/virtual_keyboard.txt) for the complete arrangement.
+On a phone or tablet, controls appear below the game in portrait orientation and beside it in landscape orientation. The PWA and Android APK each provide their own touch controls. See the [control layout](docs/virtual_keyboard.txt) for the complete arrangement.
 
 ### Updates
 

@@ -24,4 +24,5 @@ func run_fixture() -> void:
 	JavaScriptBridge.eval("window.exolonTouchReady = true", true)
 	while is_instance_valid(world) and current_scene == world:
 		JavaScriptBridge.eval("window.exolonTouchAmmo = %d" % world.TestAmmo(), true)
+		JavaScriptBridge.eval("window.exolonTestPlayer = {x: %f, y: %f, ducking: %s}" % [player.position.x, player.position.y, "true" if player.IsDucking else "false"], true)
 		await physics_frame

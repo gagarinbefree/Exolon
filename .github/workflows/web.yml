@@ -71,6 +71,8 @@ jobs:
         run: node tools/web-smoke.cjs
       - name: Test touch controls
         run: node tools/web-touch-smoke.cjs
+      - name: Test desktop controls
+        run: node tools/web-desktop-input-smoke.cjs
       - name: Test web update check
         run: node tools/web-update-smoke.cjs
       - name: Test web autosave
