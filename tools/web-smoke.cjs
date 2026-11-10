@@ -37,7 +37,7 @@ const fs = require('node:fs');
     if (!started || !titleScene) throw new Error('The C# game did not reach the title screen');
     await page.waitForTimeout(500);
     const canvas = page.locator('#canvas');
-    await canvas.click({ position: { x: 10, y: 10 } });
+    await canvas.focus();
     const title = await canvas.screenshot();
     fs.writeFileSync('artifacts/web-title.png', title);
     await page.evaluate(() => window.dispatchEvent(new Event('beforeinstallprompt', { cancelable: true })));
