@@ -1,5 +1,6 @@
 const { chromium } = require('playwright');
 const fs = require('node:fs');
+const path = require('node:path');
 
 (async () => {
   const browser = await chromium.launch({ executablePath: process.env.CHROME_PATH || '/usr/bin/google-chrome', headless: true, args: ['--no-sandbox', '--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] });
@@ -7,14 +8,19 @@ const fs = require('node:fs');
     const page = await browser.newPage({ viewport: { width: 844, height: 390 }, isMobile: true, hasTouch: true, deviceScaleFactor: 1 });
     const errors = [];
     page.on('pageerror', error => errors.push(error.message));
-    await page.goto(process.env.EXOLON_WEB_URL || 'http://127.0.0.1:8765/');
+    const base = process.env.EXOLON_WEB_URL || 'http://127.0.0.1:8765/';
+    const html = fs.readFileSync(path.join('Exolon.web', 'AppBundle', 'index.html'), 'utf8')
+      .replace("'args': [],", "'args': ['--script', 'res://tests/web_touch_fixture.gd'],");
+    if (!html.includes('web_touch_fixture.gd')) throw new Error('Unable to prepare web touch fixture');
+    await page.route('**/touch-fixture.html', route => route.fulfill({ status: 200, contentType: 'text/html', body: html }));
+    await page.goto(new URL('touch-fixture.html', base).href);
     await page.waitForSelector('#touch-controls.ready', { timeout: 120000 });
     const canvas = page.locator('#canvas');
     await page.evaluate(() => window.dispatchEvent(new Event('beforeinstallprompt', { cancelable: true })));
     if (!await page.locator('#install-app').isVisible()) throw new Error('Install prompt was not shown on the title screen');
     const title = await canvas.screenshot();
     await page.locator('#touch-fire').tap();
-    await page.waitForTimeout(1000);
+    await page.waitForFunction(() => window.exolonTouchReady === true && Number.isInteger(window.exolonTouchAmmo), null, { timeout: 30000 });
     if ((await canvas.screenshot()).equals(title)) throw new Error('Touching the fire zone did not start the game');
     if (await page.locator('#install-app').isVisible()) throw new Error('Install prompt remained visible after starting');
     await page.evaluate(() => window.dispatchEvent(new Event('beforeinstallprompt', { cancelable: true })));
@@ -30,18 +36,19 @@ const fs = require('node:fs');
       const actual = await held();
       if (JSON.stringify(actual) !== JSON.stringify([...expected].sort())) throw new Error(`Expected ${expected}; got ${actual}`);
     };
-    const gameRect = await canvas.boundingBox();
-    const ammoClip = { x: gameRect.x, y: gameRect.y + gameRect.height * .94, width: gameRect.width * .1, height: gameRect.height * .06 };
-    const ammoBefore = await page.screenshot({ clip: ammoClip });
+    const ammoBefore = await page.evaluate(() => window.exolonTouchAmmo);
     const move = await point('ArrowRight');
     const shoot = await point('Space');
     await send('touchStart', [{ ...move, id: 1 }]);
     await send('touchStart', [{ ...move, id: 1 }, { ...shoot, id: 2 }]);
-    await page.waitForTimeout(500);
-    if ((await page.screenshot({ clip: ammoClip })).equals(ammoBefore)) {
+    await assertHeld(['ArrowRight', 'Space']);
+    try {
+      await page.waitForFunction(before => window.exolonTouchAmmo === before - 1, ammoBefore, { timeout: 5000 });
+    } catch {
       fs.mkdirSync('artifacts', { recursive: true });
       await page.screenshot({ path: 'artifacts/web-touch-failure.png' });
-      throw new Error('Fire zone did not consume ammunition');
+      const ammoAfter = await page.evaluate(() => window.exolonTouchAmmo);
+      throw new Error(`Fire zone did not consume one round: ${ammoBefore} -> ${ammoAfter}`);
     }
     await send('touchEnd', [{ ...move, id: 1 }]);
     await send('touchEnd', []);
