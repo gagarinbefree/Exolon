@@ -26,8 +26,12 @@ func run_check():
 	await frames(3)
 	Input.action_release("ui_up")
 	await frames(3)
-	if not player.IsArmored or player.get_child(0).region_rect.position.x != 11 * 48:
+	var sprite: Sprite2D = player.get_child(0)
+	if not player.IsArmored or sprite.region_rect != Rect2(0, 64, 48, 64):
 		fail("Capsule did not activate the Exolon outfit")
+		return
+	if sprite.texture.get_image().get_region(Rect2i(0, 64, 48, 64)).get_used_rect().size == Vector2i.ZERO:
+		fail("Armored standing frame is empty")
 		return
 	Input.action_press("fire")
 	await frames(2)
@@ -82,6 +86,9 @@ func run_check():
 	await frames(3)
 	if player.IsDead or player.IsInvincible or world.TestMineCount() != 2 or world.TestMineFireCount() != 1:
 		fail("Armor did not protect against mine while mine still triggered")
+		return
+	if not player.Kill() or player.get_child(0).region_rect != Rect2(480, 64, 48, 64):
+		fail("Armored death frame is outside the second row")
 		return
 	print("PASS: capsule, dual shots, independent pistons, protection and outfit preservation")
 	world.queue_free()

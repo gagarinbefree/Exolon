@@ -11,6 +11,8 @@
   <a href="https://gagarinbefree.github.io/Exolon/"><strong>Play in your browser</strong></a>
   &nbsp; · &nbsp;
   <a href="https://github.com/gagarinbefree/Exolon/releases/latest"><strong>Download for Android</strong></a>
+  &nbsp; · &nbsp;
+  <a href="https://github.com/gagarinbefree/Exolon/releases/latest"><strong>Download for Windows</strong></a>
 </p>
 
 <p align="center">
@@ -66,6 +68,10 @@ The installed PWA opens in its own window and currently requires an internet con
 Download the latest signed APK from [GitHub Releases](https://github.com/gagarinbefree/Exolon/releases/latest) and install it on your Android device. Depending on your device, Android may ask you to allow installation from the app used to open the APK.
 
 Versioned APKs are also published in [GitHub Packages](https://github.com/gagarinbefree/Exolon/packages/3372432) and as Actions artifacts. Downloading from the Maven registry requires GitHub authentication.
+
+### Windows
+
+Download the Windows x64 ZIP from [GitHub Releases](https://github.com/gagarinbefree/Exolon/releases/latest), extract the entire archive and run `Exolon.exe` from the extracted folder. The Windows build is unsigned and Windows may display a security warning.
 
 ### Godot editor
 

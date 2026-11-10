@@ -24,8 +24,8 @@ jobs:
       - uses: actions/setup-dotnet@v6
         with:
           dotnet-version: 10.0.x
-      - name: Test Android template downloader
-        run: python -m unittest discover -s tools -p 'test_android_template.py'
+      - name: Test export template downloaders
+        run: python -m unittest discover -s tools -p 'test_*_template.py'
       - name: Download Godot .NET
         env:
           GH_TOKEN: ${{ github.token }}
@@ -104,6 +104,90 @@ jobs:
     steps:
       - id: deployment
         uses: actions/deploy-pages@v5
+
+  windows:
+    name: Windows x64 build
+    needs: build-and-test
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: windows-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 10.0.x
+      - name: Set build version
+        shell: pwsh
+        run: python tools/set_build_version.py "0.1.$env:GITHUB_RUN_NUMBER"
+      - name: Download Godot .NET
+        shell: pwsh
+        run: |
+          $godotDir = Join-Path $env:RUNNER_TEMP 'godot'
+          New-Item -ItemType Directory -Force -Path $godotDir | Out-Null
+          gh release download 4.7.2-stable --repo godotengine/godot-builds --pattern 'Godot_v4.7.2-stable_mono_win64.zip' --dir $godotDir
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          Expand-Archive -LiteralPath (Join-Path $godotDir 'Godot_v4.7.2-stable_mono_win64.zip') -DestinationPath $godotDir
+          $godot = Get-ChildItem -LiteralPath $godotDir -Filter '*_console.exe' -File -Recurse | Select-Object -First 1 -ExpandProperty FullName
+          if (-not $godot) { throw 'Godot .NET console executable was not found' }
+          "GODOT=$godot" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+      - name: Cache verified Windows export template
+        uses: actions/cache@v5
+        with:
+          path: .godot/windows_release_x86_64.exe
+          key: godot-4.7.2-mono-windows-x64-release-abb825fa
+      - name: Install Windows export template
+        shell: pwsh
+        run: |
+          python tools/get_windows_template.py .godot/windows_release_x86_64.exe
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $templateDir = Join-Path $env:APPDATA 'Godot/export_templates/4.7.2.stable.mono'
+          New-Item -ItemType Directory -Force -Path $templateDir | Out-Null
+          Copy-Item -LiteralPath '.godot/windows_release_x86_64.exe' -Destination $templateDir
+          Set-Content -LiteralPath (Join-Path $templateDir 'version.txt') -Value '4.7.2.stable.mono' -NoNewline
+      - name: Export Windows game
+        shell: pwsh
+        run: |
+          dotnet build Exolon.csproj --configuration Debug
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          & $env:GODOT --headless --path . --editor --import
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          New-Item -ItemType Directory -Force -Path build/windows | Out-Null
+          & $env:GODOT --headless --path . --export-release 'Windows Desktop' 'build/windows/Exolon.exe'
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          if (-not (Test-Path -LiteralPath 'build/windows/Exolon.exe') -or -not (Test-Path -LiteralPath 'build/windows/Exolon.pck')) { throw 'Windows export is incomplete' }
+          if (-not (Test-Path -LiteralPath 'build/windows/data_Exolon_windows_x86_64/Exolon.dll')) { throw 'Windows .NET runtime files are missing' }
+          $log = Join-Path (Get-Location).Path 'build/windows-smoke.log'
+          $exe = Join-Path (Get-Location).Path 'build/windows/Exolon.exe'
+          $process = Start-Process -FilePath $exe -ArgumentList '--headless', '--audio-driver', 'Dummy', '--quit-after', '120', '--log-file', $log -WindowStyle Hidden -Wait -PassThru
+          if ($process.ExitCode -ne 0) { throw "Windows game failed to start: $($process.ExitCode)" }
+          if (Select-String -LiteralPath $log -Pattern 'ERROR:' -Quiet) { Get-Content -LiteralPath $log; throw 'Windows game logged an error during startup' }
+          Compress-Archive -Path 'build/windows/*' -DestinationPath "build/Exolon-Windows-0.1.$env:GITHUB_RUN_NUMBER.zip"
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Exolon-Windows-0.1.${{ github.run_number }}
+          path: build/Exolon-Windows-*.zip
+          if-no-files-found: error
+
+  publish-windows:
+    name: Publish Windows release
+    needs: [windows, android]
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          name: Exolon-Windows-0.1.${{ github.run_number }}
+          path: build
+      - name: Attach Windows archive to release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release upload "v0.1.${GITHUB_RUN_NUMBER}" "build/Exolon-Windows-0.1.${GITHUB_RUN_NUMBER}.zip" --repo "$GITHUB_REPOSITORY" --clobber
 
   android:
     name: Android APK

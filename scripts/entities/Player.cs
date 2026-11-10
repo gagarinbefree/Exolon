@@ -113,7 +113,13 @@ public partial class Player : CharacterBody2D
 		else if (Math.Abs(Velocity.X) > 0.1f) { frame = WalkFrames[(_walkTick++ / 3) % WalkFrames.Length]; }
 		else { frame = 0; _walkTick = 0; }
 		if (IsArmored) frame += 11;
-		_sprite.RegionRect = new Rect2(frame * 48, 0, 48, 64);
+		SetSpriteFrame(frame);
+	}
+
+	private void SetSpriteFrame(int frame)
+	{
+		const int columns = 11;
+		_sprite.RegionRect = new Rect2((frame % columns) * 48, (frame / columns) * 64, 48, 64);
 	}
 
 	public bool Kill()
@@ -121,7 +127,7 @@ public partial class Player : CharacterBody2D
 		if (IsDead || IsInvincible) return false;
 		IsDead = true;
 		Velocity = new Vector2(0, JumpSpeed);
-		_sprite.RegionRect = new Rect2((IsArmored ? 21 : 10) * 48, 0, 48, 64);
+		SetSpriteFrame(IsArmored ? 21 : 10);
 		return true;
 	}
 
