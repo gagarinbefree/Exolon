@@ -43,8 +43,11 @@ public partial class TitleScreen : Node2D
 		{
 			if (_selection == 0 || (_hasSave && _selection == 1))
 			{
-				if (_selection == 0) AutoSave.StartNew();
-				else if (!AutoSave.PrepareContinue()) { _hasSave = false; _selection = 0; QueueRedraw(); return; }
+				if (_hasSave && _selection == 0)
+				{
+					if (!AutoSave.PrepareContinue()) { _hasSave = false; _selection = 0; QueueRedraw(); return; }
+				}
+				else AutoSave.StartNew();
 				if (OS.HasFeature("web")) JavaScriptBridge.Eval("window.exolonGameStarted?.()", true);
 				GetTree().ChangeSceneToFile("res://scenes/screens/first_screen.tscn");
 			}
@@ -183,8 +186,8 @@ public partial class TitleScreen : Node2D
 		DrawText("green", "BY  RAFFAELE CECCO", 112, 96);
 		if (!_updatesScreen)
 		{
-			DrawOption("PLAY", _hasSave ? 168 : 184, _selection == 0);
-			if (_hasSave) DrawOption("CONTINUE", 208, _selection == 1);
+			if (_hasSave) DrawOption("CONTINUE", 168, _selection == 0);
+			DrawOption("PLAY", _hasSave ? 208 : 184, _selection == (_hasSave ? 1 : 0));
 			DrawOption("CHECK FOR UPDATES", _hasSave ? 248 : 224, _selection == (_hasSave ? 2 : 1));
 			DrawText("green", "UP DOWN + FIRE", 144, 288);
 		}

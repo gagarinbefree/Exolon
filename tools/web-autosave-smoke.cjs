@@ -38,13 +38,13 @@ const path = require('node:path');
     console.log('Checkpoint stored; reopening the game');
     await page.goto(base);
     await page.waitForSelector('#touch-controls.ready', { state: 'attached', timeout: 120000 });
-    await page.keyboard.press('ArrowDown', { delay: 150 });
-    await page.keyboard.press('Space', { delay: 150 });
+    await page.keyboard.press('Enter', { delay: 150 });
     await page.waitForTimeout(1200);
     const continued = await page.locator('#canvas').screenshot();
     await page.goto(base);
     await page.waitForSelector('#touch-controls.ready', { state: 'attached', timeout: 120000 });
-    await page.keyboard.press('Space', { delay: 150 });
+    await page.keyboard.press('ArrowDown', { delay: 150 });
+    await page.keyboard.press('Enter', { delay: 150 });
     await page.waitForTimeout(1200);
     const newGame = await page.locator('#canvas').screenshot();
     const readHud = async screenshot => page.evaluate(async data => {

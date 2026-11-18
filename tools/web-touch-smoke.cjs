@@ -38,10 +38,10 @@ const path = require('node:path');
     };
     const ammoBefore = await page.evaluate(() => window.exolonTouchAmmo);
     const move = await point('ArrowRight');
-    const shoot = await point('Space');
+    const shoot = await point('Enter');
     await send('touchStart', [{ ...move, id: 1 }]);
     await send('touchStart', [{ ...move, id: 1 }, { ...shoot, id: 2 }]);
-    await assertHeld(['ArrowRight', 'Space']);
+    await assertHeld(['ArrowRight', 'Enter']);
     try {
       await page.waitForFunction(before => window.exolonTouchAmmo === before - 1, ammoBefore, { timeout: 5000 });
     } catch {
@@ -102,12 +102,12 @@ const path = require('node:path');
       if (borders.some(border => border.left || border.right || border.top || border.bottom)) throw new Error('Outer control border is visible');
       const upLeft = await point('ArrowUp ArrowLeft');
       const upRight = await point('ArrowUp ArrowRight');
-      const fire = await point('Space');
+      const fire = await point('Enter');
       await send('touchStart', [{ ...upLeft, id: 1 }]);
       await send('touchStart', [{ ...upLeft, id: 1 }, { ...fire, id: 2 }]);
-      await assertHeld(['ArrowUp', 'ArrowLeft', 'Space']);
+      await assertHeld(['ArrowUp', 'ArrowLeft', 'Enter']);
       await send('touchMove', [{ ...upRight, id: 1 }, { ...fire, id: 2 }]);
-      await assertHeld(['ArrowUp', 'ArrowRight', 'Space']);
+      await assertHeld(['ArrowUp', 'ArrowRight', 'Enter']);
       await send('touchEnd', []);
       await assertHeld([]);
       fs.mkdirSync('artifacts', { recursive: true });

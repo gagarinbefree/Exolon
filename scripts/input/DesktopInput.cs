@@ -8,7 +8,9 @@ public partial class DesktopInput : Node
 		AddKey("ui_left", Key.A);
 		AddKey("ui_right", Key.D);
 		AddKey("ui_up", Key.W);
+		AddKey("ui_up", Key.Space);
 		AddKey("ui_down", Key.S);
+		AddKey("fire", Key.Enter);
 
 		// Mobile touch can be emulated as a mouse click; it has its own fire control.
 		if (!OS.HasFeature("android") && !OS.HasFeature("ios"))

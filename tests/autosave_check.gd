@@ -51,7 +51,6 @@ func run_check() -> void:
 	# Leave and continue through the actual title-screen controls.
 	change_scene_to_file("res://scenes/screens/title_screen.tscn")
 	await frames(5)
-	await press("ui_down")
 	await press("fire")
 	await frames(8)
 	if current_scene.name != "FirstScreen": return fail("Continue did not start a game")
@@ -69,7 +68,6 @@ func run_check() -> void:
 		return fail("Second checkpoint did not replace the first")
 	change_scene_to_file("res://scenes/screens/game_over_menu.tscn")
 	await frames(5)
-	await press("ui_down")
 	await press("fire")
 	await frames(8)
 	if current_scene.name != "FirstScreen" or current_scene.TestZone() != 2:
@@ -89,10 +87,19 @@ func run_check() -> void:
 
 	change_scene_to_file("res://scenes/screens/game_over_menu.tscn")
 	await frames(5)
+	await press("ui_down")
 	await press("fire")
 	await frames(8)
 	if current_scene.name != "FirstScreen" or current_scene.TestZone() != 0 or current_scene.TestAmmo() != 99:
 		return fail("Start again did not start a fresh game")
+	# PLAY follows CONTINUE when the title menu has a checkpoint.
+	change_scene_to_file("res://scenes/screens/title_screen.tscn")
+	await frames(5)
+	await press("ui_down")
+	await press("fire")
+	await frames(8)
+	if current_scene.name != "FirstScreen" or current_scene.TestZone() != 0:
+		return fail("Title PLAY did not start a fresh game")
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(save_path))
 	print("PASS: checkpoints, continue, main menu and starting over")
 	quit()

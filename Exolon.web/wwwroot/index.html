@@ -268,7 +268,7 @@
             <div class="touch-zone" data-keys="ArrowRight" aria-label="Right"></div>
             <div class="touch-zone" data-keys="ArrowDown" aria-label="Down"></div>
         </div>
-        <div id="touch-fire" class="touch-area touch-zone" data-keys="Space" aria-label="Fire"></div>
+        <div id="touch-fire" class="touch-area touch-zone" data-keys="Enter" aria-label="Fire"></div>
     </div>
 
     <noscript>
@@ -314,7 +314,7 @@
         const arrowAngles = { 'ArrowUp': 0, 'ArrowUp ArrowRight': 45, 'ArrowRight': 90,
             'ArrowDown': 180, 'ArrowLeft': -90, 'ArrowUp ArrowLeft': -45 };
         for (const zone of controls.querySelectorAll('.touch-zone')) {
-            const fire = zone.dataset.keys === 'Space';
+            const fire = zone.dataset.keys === 'Enter';
             const shape = fire
                 ? '<circle cx="12" cy="12" r="8"/><path d="M12 1v6M12 17v6M1 12h6M17 12h6"/>'
                 : '<path d="M12 19V5M5 12l7-7 7 7"/>';
@@ -326,10 +326,10 @@
         const keyCounts = new Map();
         const keyDownAt = new Map();
         const releaseTimers = new Map();
-        const keyCodes = { ArrowLeft: 37, ArrowUp: 38, ArrowRight: 39, ArrowDown: 40, Space: 32 };
+        const keyCodes = { ArrowLeft: 37, ArrowUp: 38, ArrowRight: 39, ArrowDown: 40, Enter: 13 };
         function sendKey(code, pressed) {
             canvas.dispatchEvent(new KeyboardEvent(pressed ? 'keydown' : 'keyup', {
-                key: code === 'Space' ? ' ' : code, code, keyCode: keyCodes[code],
+                key: code, code, keyCode: keyCodes[code],
                 which: keyCodes[code], bubbles: true, cancelable: true
             }));
         }

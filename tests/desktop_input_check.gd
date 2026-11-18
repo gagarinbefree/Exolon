@@ -31,8 +31,10 @@ func run_check() -> void:
 		event.keycode = binding[0]
 		if not event.is_action(binding[1]):
 			return fail("Missing arrow binding: %s" % binding[1])
-	if not key_event(KEY_SPACE, true).is_action("fire") or not mouse_event(true).is_action("fire"):
-		return fail("Space or left mouse button is not bound to fire")
+	if not key_event(KEY_SPACE, true).is_action("ui_up") or key_event(KEY_SPACE, true).is_action("fire"):
+		return fail("Space must jump without firing")
+	if not key_event(KEY_ENTER, true).is_action("fire") or not mouse_event(true).is_action("fire"):
+		return fail("Enter or left mouse button is not bound to fire")
 
 	var world = load("res://scenes/screens/first_screen.tscn").instantiate()
 	root.add_child(world)
@@ -64,7 +66,15 @@ func run_check() -> void:
 	Input.parse_input_event(key_event(KEY_W, false))
 	if player.position.y >= start_y - 1:
 		return fail("W did not make the player jump")
-	for event in [mouse_event(true), key_event(KEY_SPACE, true)]:
+	await frames(90)
+	start_y = player.position.y
+	var before_jump: int = world.TestAmmo()
+	Input.parse_input_event(key_event(KEY_SPACE, true))
+	await frames(5)
+	Input.parse_input_event(key_event(KEY_SPACE, false))
+	if player.position.y >= start_y - 1 or world.TestAmmo() != before_jump:
+		return fail("Space did not jump, or also fired")
+	for event in [mouse_event(true), key_event(KEY_ENTER, true)]:
 		var ammo: int = world.TestAmmo()
 		Input.parse_input_event(event)
 		await frames(5)
@@ -72,6 +82,6 @@ func run_check() -> void:
 		Input.parse_input_event(event)
 		await frames(5)
 		if world.TestAmmo() != ammo - 1:
-			return fail("Mouse or Space did not consume a round")
-	print("PASS: WASD, arrow keys, mouse fire and Space")
+			return fail("Mouse or Enter did not consume a round")
+	print("PASS: WASD, arrow keys, Space jump and mouse/Enter fire")
 	quit(0)

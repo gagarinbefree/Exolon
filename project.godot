@@ -36,7 +36,7 @@ project/assembly_name="Exolon"
 
 fire={
 "deadzone": 0.5,
-"events": [Object(InputEventKey,"physical_keycode":32)]
+"events": []
 }
 
 [physics]

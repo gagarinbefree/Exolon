@@ -54,7 +54,7 @@ Touch controls adapt to the orientation of your phone or tablet:
 
 ### Browser and PWA
 
-Open **[Play Exolon](https://gagarinbefree.github.io/Exolon/)** in a browser with WebGL 2 support. Wait for the game to load, then press **Space** or tap the **crosshair** on the title screen.
+Open **[Play Exolon](https://gagarinbefree.github.io/Exolon/)** in a browser with WebGL 2 support. Wait for the game to load, then press **Enter**, click the left mouse button or tap the **crosshair** on the title screen.
 
 To add the game to your home screen:
 
@@ -84,11 +84,11 @@ Open `project.godot` in Godot 4.7.2 .NET, build the C# project with the .NET 10 
 | Key | Action |
 | --- | --- |
 | A / D or Left / Right | Walk |
-| W or Up | Jump, use a teleport or enter an armour capsule |
+| W, Space or Up | Jump, use a teleport or enter an armour capsule |
 | S or Down | Duck |
-| Space or left mouse button | Fire the blaster; hold to launch a grenade |
+| Enter or left mouse button | Fire the blaster; hold to launch a grenade |
 
-Press **Space** or the **left mouse button** on the title screen to start. Use **W** or **Up** while inside a teleport or armour capsule to activate it. Press fire again on the bonus screen to stop the pointer.
+Press **Enter** or the **left mouse button** on the title screen to start. Use **W**, **Space** or **Up** while inside a teleport or armour capsule to activate it. Press fire again on the bonus screen to stop the pointer.
 
 ### Touchscreen
 

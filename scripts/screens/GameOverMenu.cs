@@ -27,8 +27,11 @@ public partial class GameOverMenu : Node2D
 			GetTree().ChangeSceneToFile("res://scenes/screens/title_screen.tscn");
 			return;
 		}
-		if (_selection == 0) AutoSave.StartNew();
-		else if (!AutoSave.PrepareContinue()) { _hasSave = false; _selection = 0; QueueRedraw(); return; }
+		if (_hasSave && _selection == 0)
+		{
+			if (!AutoSave.PrepareContinue()) { _hasSave = false; _selection = 0; QueueRedraw(); return; }
+		}
+		else AutoSave.StartNew();
 		GetTree().ChangeSceneToFile("res://scenes/screens/first_screen.tscn");
 	}
 
@@ -37,8 +40,8 @@ public partial class GameOverMenu : Node2D
 		DrawRect(new Rect2(0, 0, 512, 384), Colors.Black);
 		DrawTexture(GD.Load<Texture2D>("res://assets/images/title.png"), new Vector2(128, 0));
 		DrawText("red", "GAME OVER", 128);
-		DrawOption("START AGAIN", _hasSave ? 176 : 200, _selection == 0);
-		if (_hasSave) DrawOption("CONTINUE", 216, _selection == 1);
+		if (_hasSave) DrawOption("CONTINUE", 176, _selection == 0);
+		DrawOption("START AGAIN", _hasSave ? 216 : 200, _selection == (_hasSave ? 1 : 0));
 		DrawOption("MAIN MENU", _hasSave ? 256 : 240, _selection == (_hasSave ? 2 : 1));
 		DrawText("green", "UP DOWN + FIRE", 304);
 	}

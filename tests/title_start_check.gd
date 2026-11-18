@@ -15,13 +15,13 @@ func run_check():
 	for i in range(10): await physics_frame
 	Input.action_release("fire")
 	for i in range(3): await physics_frame
-	if not current_scene or current_scene.name != "FirstScreen": return fail("Space did not start the game")
+	if not current_scene or current_scene.name != "FirstScreen": return fail("Fire did not start the game")
 	if current_scene.TestAmmo() != 99: return fail("Starting the game also fired the blaster")
 	Input.action_press("fire")
 	for i in range(3): await physics_frame
 	Input.action_release("fire")
 	if current_scene.TestAmmo() != 98: return fail("Fire did not work after releasing the start key")
-	print("PASS: game opens on the title screen and Space starts without firing")
+	print("PASS: game opens on the title screen and fire starts without firing")
 	quit(0)
 
 func fail(message: String):
