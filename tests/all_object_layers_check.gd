@@ -4,6 +4,7 @@ func _initialize():
 	call_deferred("run_check")
 
 func run_check():
+	var cleanup = preload("res://tests/support/ManagedResourceCleanup.cs").new()
 	var checked := 0
 	for level in range(1, 4):
 		for screen in range(1, 26):
@@ -40,6 +41,8 @@ func run_check():
 					return
 				checked += 1
 			world.queue_free()
+			await process_frame
+			cleanup.CollectReleasedResources()
 			await process_frame
 	print("PASS: %d map objects have the expected order relative to the player across 75 zones" % checked)
 	quit(0)
