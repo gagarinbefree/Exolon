@@ -1,0 +1,25 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/MenuOption.cs" id="MenuOption"]
+[ext_resource type="Texture2D" path="res://assets/images/font_purple.png" id="purple"]
+[ext_resource type="Texture2D" path="res://assets/images/font_cyan.png" id="cyan"]
+[ext_resource type="Texture2D" path="res://assets/images/egg.png" id="egg"]
+
+[node name="MenuOption" type="Control"]
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 128.0
+offset_bottom = 16.0
+mouse_filter = 2
+script = ExtResource("MenuOption")
+Text = "CONTINUE"
+Atlas = ExtResource("cyan")
+SelectedAtlas = ExtResource("purple")
+Selected = true
+
+[node name="Cursor" type="Sprite2D" parent="."]
+position = Vector2(-24, 0)
+texture = ExtResource("egg")
+centered = false
+region_enabled = true
+region_rect = Rect2(0, 0, 16, 16)

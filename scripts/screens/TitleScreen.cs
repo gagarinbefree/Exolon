@@ -14,14 +14,25 @@ public partial class TitleScreen : Node2D
 	private string _downloadUrl = "";
 	private bool _updateAvailable;
 	private bool _hasSave;
+	private SaveMenuOptions _options = null!;
+	private Node2D _updateMenu = null!;
+	private BitmapText _instructions = null!, _statusLabel = null!, _versionLabel = null!;
+	private MenuOption _update = null!, _cancel = null!;
 
 	public override void _Ready()
 	{
+		_options = GetNode<SaveMenuOptions>("Options");
+		_instructions = GetNode<BitmapText>("Instructions");
+		_updateMenu = GetNode<Node2D>("UpdateMenu");
+		_statusLabel = _updateMenu.GetNode<BitmapText>("Status");
+		_versionLabel = _updateMenu.GetNode<BitmapText>("Version");
+		_update = _updateMenu.GetNode<MenuOption>("Update");
+		_cancel = _updateMenu.GetNode<MenuOption>("Cancel");
 		_hasSave = AutoSave.HasSave();
 		_audio = new AudioStreamPlayer { Stream = GD.Load<AudioStream>("res://assets/sound/theme.ogg") };
 		AddChild(_audio);
 		_audio.Play();
-		QueueRedraw();
+		RefreshMenu();
 	}
 
 	public override void _ExitTree()
@@ -36,7 +47,7 @@ public partial class TitleScreen : Node2D
 		{
 			if (!_updatesScreen) _selection = (_selection + (Input.IsActionJustPressed("ui_up") ? -1 : 1) + (_hasSave ? 3 : 2)) % (_hasSave ? 3 : 2);
 			else if (_updateAvailable) _selection = 1 - _selection;
-			QueueRedraw();
+			RefreshMenu();
 		}
 		if (!firePressed) return;
 		if (!_updatesScreen)
@@ -45,7 +56,7 @@ public partial class TitleScreen : Node2D
 			{
 				if (_hasSave && _selection == 0)
 				{
-					if (!AutoSave.PrepareContinue()) { _hasSave = false; _selection = 0; QueueRedraw(); return; }
+					if (!AutoSave.PrepareContinue()) { _hasSave = false; _selection = 0; RefreshMenu(); return; }
 				}
 				else AutoSave.StartNew();
 				if (OS.HasFeature("web")) JavaScriptBridge.Eval("window.exolonGameStarted?.()", true);
@@ -65,11 +76,11 @@ public partial class TitleScreen : Node2D
 		_latest = "";
 		_downloadUrl = "";
 		_status = "CHECKING...";
-		QueueRedraw();
+		RefreshMenu();
 		if (!OS.HasFeature("web") && !OS.HasFeature("android"))
 		{
 			_status = "NOT AVAILABLE ON DESKTOP";
-			QueueRedraw();
+			RefreshMenu();
 			return;
 		}
 		string url = OS.HasFeature("web")
@@ -112,21 +123,21 @@ public partial class TitleScreen : Node2D
 				_status = "UPDATE FILE NOT FOUND";
 				_selection = 1;
 				ClearRequest();
-				QueueRedraw();
+				RefreshMenu();
 				return;
 			}
 		}
 		_status = _updateAvailable ? "UPDATE AVAILABLE" : "YOU ARE UP TO DATE";
 		_selection = _updateAvailable ? 0 : 1;
 		ClearRequest();
-		QueueRedraw();
+		RefreshMenu();
 	}
 
 	private void FinishWithError()
 	{
 		_status = "CHECK FAILED - TRY AGAIN";
 		ClearRequest();
-		QueueRedraw();
+		RefreshMenu();
 	}
 
 	private void ClearRequest()
@@ -140,7 +151,7 @@ public partial class TitleScreen : Node2D
 		ClearRequest();
 		_updatesScreen = false;
 		_selection = _hasSave ? 2 : 1;
-		QueueRedraw();
+		RefreshMenu();
 	}
 
 	private void ApplyUpdate()
@@ -149,7 +160,7 @@ public partial class TitleScreen : Node2D
 		else if (OS.ShellOpen(_downloadUrl) != Error.Ok)
 		{
 			_status = "DOWNLOAD FAILED";
-			QueueRedraw();
+			RefreshMenu();
 		}
 	}
 
@@ -179,51 +190,19 @@ public partial class TitleScreen : Node2D
 		return release.VariantType == Variant.Type.Dictionary ? AndroidApkUrl(release.AsGodotDictionary(), version) : "";
 	}
 
-	public override void _Draw()
+	private void RefreshMenu()
 	{
-		DrawRect(new Rect2(0, 0, 512, 384), Colors.Black);
-		DrawTexture(GD.Load<Texture2D>("res://assets/images/title.png"), new Vector2(128, 0));
-		DrawText("green", "BY  RAFFAELE CECCO", 112, 96);
+		_options.Visible = _instructions.Visible = !_updatesScreen;
+		_updateMenu.Visible = _updatesScreen;
 		if (!_updatesScreen)
 		{
-			if (_hasSave) DrawOption("CONTINUE", 168, _selection == 0);
-			DrawOption("PLAY", _hasSave ? 208 : 184, _selection == (_hasSave ? 1 : 0));
-			DrawOption("CHECK FOR UPDATES", _hasSave ? 248 : 224, _selection == (_hasSave ? 2 : 1));
-			DrawText("green", "UP DOWN + FIRE", 144, 288);
+			_options.ShowSelection(_hasSave, _selection);
+			return;
 		}
-		else
-		{
-			DrawCentered("cyan", "CHECK FOR UPDATES", 152);
-			DrawCentered("green", _status, 192);
-			if (_updateAvailable)
-			{
-				DrawCentered("green", "NEW VERSION " + _latest, 216);
-				DrawOption("UPDATE", 256, _selection == 0);
-			}
-			DrawOption("CANCEL", 296, _selection == 1);
-		}
-		DrawText("red", "EXOLON COPYRIGHT 1987 HEWSON", 32, 368);
-	}
-
-	private void DrawCentered(string color, string text, int y) => DrawText(color, text, (512 - text.Length * 16) / 2, y);
-
-	private void DrawOption(string text, int y, bool selected)
-	{
-		int x = (512 - text.Length * 16) / 2;
-		if (selected)
-			DrawTextureRectRegion(GD.Load<Texture2D>("res://assets/images/egg.png"), new Rect2(x - 24, y, 16, 16), new Rect2(0, 0, 16, 16));
-		DrawText(selected ? "purple" : "cyan", text, x, y);
-	}
-
-	private void DrawText(string color, string text, int x, int y)
-	{
-		Texture2D font = GD.Load<Texture2D>($"res://assets/images/font_{color}.png");
-		int columns = font.GetWidth() / 16;
-		foreach (char c in text)
-		{
-			int index = c - 32;
-			DrawTextureRectRegion(font, new Rect2(x, y, 16, 16), new Rect2(index % columns * 16, index / columns * 16, 16, 16));
-			x += 16;
-		}
+		_statusLabel.Text = _status;
+		_versionLabel.Visible = _update.Visible = _updateAvailable;
+		_versionLabel.Text = "NEW VERSION " + _latest;
+		_update.Selected = _selection == 0;
+		_cancel.Selected = _selection == 1;
 	}
 }

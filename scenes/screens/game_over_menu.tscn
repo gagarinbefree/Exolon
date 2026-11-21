@@ -1,6 +1,83 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene load_steps=8 format=3]
 
-[ext_resource type="Script" path="res://scripts/screens/GameOverMenu.cs" id="1"]
+[ext_resource type="Script" path="res://scripts/screens/GameOverMenu.cs" id="GameOverMenu"]
+[ext_resource type="Texture2D" path="res://assets/images/title.png" id="title"]
+[ext_resource type="Script" path="res://scripts/ui/BitmapText.cs" id="BitmapText"]
+[ext_resource type="Texture2D" path="res://assets/images/font_green.png" id="green"]
+[ext_resource type="Texture2D" path="res://assets/images/font_red.png" id="red"]
+[ext_resource type="Script" path="res://scripts/ui/SaveMenuOptions.cs" id="SaveMenuOptions"]
+[ext_resource type="PackedScene" path="res://scenes/ui/menu_option.tscn" id="Option"]
 
 [node name="GameOverMenu" type="Node2D"]
-script = ExtResource("1")
+script = ExtResource("GameOverMenu")
+
+[node name="Background" type="ColorRect" parent="."]
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 512.0
+offset_bottom = 384.0
+mouse_filter = 2
+color = Color(0, 0, 0, 1)
+
+[node name="Logo" type="Sprite2D" parent="."]
+position = Vector2(128, 0)
+texture = ExtResource("title")
+centered = false
+
+[node name="Heading" type="Control" parent="."]
+offset_left = 0.0
+offset_top = 128.0
+offset_right = 512.0
+offset_bottom = 144.0
+mouse_filter = 2
+script = ExtResource("BitmapText")
+Text = "GAME OVER"
+Atlas = ExtResource("red")
+Centered = true
+
+[node name="Options" type="Node2D" parent="."]
+script = ExtResource("SaveMenuOptions")
+
+[node name="Continue" parent="Options" instance=ExtResource("Option")]
+offset_left = 192.0
+offset_top = 176.0
+offset_right = 320.0
+offset_bottom = 192.0
+mouse_filter = 2
+Text = "CONTINUE"
+Selected = true
+
+[node name="Actions" type="Node2D" parent="Options"]
+position = Vector2(0, 216)
+
+[node name="StartAgain" parent="Options/Actions" instance=ExtResource("Option")]
+offset_left = 168.0
+offset_top = 0.0
+offset_right = 344.0
+offset_bottom = 16.0
+mouse_filter = 2
+Text = "START AGAIN"
+Selected = false
+
+[node name="MainMenu" parent="Options/Actions" instance=ExtResource("Option")]
+offset_left = 184.0
+offset_top = 40.0
+offset_right = 328.0
+offset_bottom = 56.0
+mouse_filter = 2
+Text = "MAIN MENU"
+Selected = false
+
+[node name="ActionsWithoutSave" type="Marker2D" parent="Options"]
+position = Vector2(0, 200)
+
+[node name="Instructions" type="Control" parent="."]
+offset_left = 0.0
+offset_top = 304.0
+offset_right = 512.0
+offset_bottom = 320.0
+mouse_filter = 2
+script = ExtResource("BitmapText")
+Text = "UP DOWN + FIRE"
+Atlas = ExtResource("green")
+Centered = true

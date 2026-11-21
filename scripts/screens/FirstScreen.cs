@@ -15,6 +15,7 @@ public partial class FirstScreen : Node2D
 	private readonly List<(int X, int Y, uint Gid)> _tiles = new();
 	private readonly List<(int X, int Y, uint Gid, int Z)> _foregroundTiles = new();
 	private readonly List<MapObjectView> _objectViews = new();
+	private Hud _hud = null!;
 	private MapObjectView _dynamicView = null!;
 	private const int PlayerZ = 2048;
 	private Node2D _foreground = null!;
@@ -193,7 +194,13 @@ public partial class FirstScreen : Node2D
 		AddChild(_dynamicView);
 		AddChild(new MapObjectView { Name = "EnemyExplosions", ZIndex = PlayerZ + 1, DrawObject = target => DrawEffects(target, "circular_explosion") });
 		AddChild(new MapObjectView { Name = "ExplosionParticles", ZIndex = 3800, DrawObject = target => DrawEffects(target, "explosion_particle") });
-		AddChild(new MapObjectView { Name = "HUD", ZIndex = 3900, DrawObject = DrawHud });
+		// The standalone zone launchers also use this controller.
+		_hud = GetNodeOrNull<Hud>("HUD");
+		if (_hud == null)
+		{
+			_hud = GD.Load<PackedScene>("res://scenes/ui/hud.tscn").Instantiate<Hud>();
+			AddChild(_hud);
+		}
 		AutoSave.Checkpoint? checkpoint = Engine.IsEditorHint() ? null : AutoSave.Consume();
 		_zone = checkpoint?.Zone ?? InitialZoneCount;
 		if (checkpoint != null)
@@ -203,6 +210,7 @@ public partial class FirstScreen : Node2D
 		}
 		_awaitFireRelease = Input.IsActionPressed("fire");
 		LoadMap(checkpoint?.Level ?? InitialLevel);
+		_hud.SetValues(_ammo, _grenades, _points, _lives, _zone);
 		if (Engine.IsEditorHint()) { QueueRedraw(); return; }
 		if (checkpoint != null)
 		{
@@ -1162,18 +1170,8 @@ public partial class FirstScreen : Node2D
 		DrawTextureRectRegion(chosen.Texture, new Rect2(x, y + 16 - chosen.Height, chosen.Width, chosen.Height), source);
 	}
 
-	private void DrawHud(CanvasItem target)
+	public override void _Process(double delta)
 	{
-		target.DrawRect(new Rect2(0, 352, 512, 32), Colors.Black);
-		DrawTextOn(target, "cyan", "AMMO", 0, 352); DrawTextOn(target, "white", _ammo.ToString("D2"), 16, 368);
-		DrawTextOn(target, "yellow", "GRENADES", 80, 352); DrawTextOn(target, "purple", _grenades.ToString("D2"), 128, 368);
-		DrawTextOn(target, "green", "POINTS", 224, 352); DrawTextOn(target, "cyan", _points.ToString("D6"), 224, 368);
-		DrawTextOn(target, "white", "LIVES", 336, 352); DrawTextOn(target, "yellow", _lives.ToString(), 368, 368);
-		DrawTextOn(target, "purple", "ZONES", 432, 352); DrawTextOn(target, "yellow", _zone.ToString("D3"), 448, 368);
-	}
-
-	private void DrawTextOn(CanvasItem target, string font, string text, int x, int y)
-	{
-		foreach (char c in text) { DrawFrameOn(target, "font_" + font, x, y, 16, 16, c - 32); x += 16; }
+		if (!Engine.IsEditorHint()) _hud.SetValues(_ammo, _grenades, _points, _lives, _zone);
 	}
 }

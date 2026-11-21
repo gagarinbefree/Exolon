@@ -1,0 +1,59 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/BitmapText.cs" id="BitmapText"]
+[ext_resource type="Texture2D" path="res://assets/images/font_cyan.png" id="cyan"]
+[ext_resource type="Texture2D" path="res://assets/images/font_green.png" id="green"]
+[ext_resource type="PackedScene" path="res://scenes/ui/menu_option.tscn" id="Option"]
+
+[node name="UpdateMenu" type="Node2D"]
+
+[node name="Heading" type="Control" parent="."]
+offset_left = 0.0
+offset_top = 152.0
+offset_right = 512.0
+offset_bottom = 168.0
+mouse_filter = 2
+script = ExtResource("BitmapText")
+Text = "CHECK FOR UPDATES"
+Atlas = ExtResource("cyan")
+Centered = true
+
+[node name="Status" type="Control" parent="."]
+offset_left = 0.0
+offset_top = 192.0
+offset_right = 512.0
+offset_bottom = 208.0
+mouse_filter = 2
+script = ExtResource("BitmapText")
+Text = "CHECKING..."
+Atlas = ExtResource("green")
+Centered = true
+
+[node name="Version" type="Control" parent="."]
+offset_left = 0.0
+offset_top = 216.0
+offset_right = 512.0
+offset_bottom = 232.0
+mouse_filter = 2
+script = ExtResource("BitmapText")
+Text = "NEW VERSION"
+Atlas = ExtResource("green")
+Centered = true
+
+[node name="Update" parent="." instance=ExtResource("Option")]
+offset_left = 208.0
+offset_top = 256.0
+offset_right = 304.0
+offset_bottom = 272.0
+mouse_filter = 2
+Text = "UPDATE"
+Selected = false
+
+[node name="Cancel" parent="." instance=ExtResource("Option")]
+offset_left = 208.0
+offset_top = 296.0
+offset_right = 304.0
+offset_bottom = 312.0
+mouse_filter = 2
+Text = "CANCEL"
+Selected = true

@@ -5,11 +5,13 @@ public partial class GameOverMenu : Node2D
 {
 	private bool _hasSave;
 	private int _selection;
+	private SaveMenuOptions _options = null!;
 
 	public override void _Ready()
 	{
+		_options = GetNode<SaveMenuOptions>("Options");
 		_hasSave = AutoSave.HasSave();
-		QueueRedraw();
+		_options.ShowSelection(_hasSave, _selection);
 	}
 
 	public override void _PhysicsProcess(double delta)
@@ -19,7 +21,7 @@ public partial class GameOverMenu : Node2D
 		{
 			int count = _hasSave ? 3 : 2;
 			_selection = (_selection + (Input.IsActionJustPressed("ui_up") ? -1 : 1) + count) % count;
-			QueueRedraw();
+			_options.ShowSelection(_hasSave, _selection);
 		}
 		if (!fire) return;
 		if (_selection == (_hasSave ? 2 : 1))
@@ -29,40 +31,9 @@ public partial class GameOverMenu : Node2D
 		}
 		if (_hasSave && _selection == 0)
 		{
-			if (!AutoSave.PrepareContinue()) { _hasSave = false; _selection = 0; QueueRedraw(); return; }
+			if (!AutoSave.PrepareContinue()) { _hasSave = false; _selection = 0; _options.ShowSelection(_hasSave, _selection); return; }
 		}
 		else AutoSave.StartNew();
 		GetTree().ChangeSceneToFile("res://scenes/screens/first_screen.tscn");
-	}
-
-	public override void _Draw()
-	{
-		DrawRect(new Rect2(0, 0, 512, 384), Colors.Black);
-		DrawTexture(GD.Load<Texture2D>("res://assets/images/title.png"), new Vector2(128, 0));
-		DrawText("red", "GAME OVER", 128);
-		if (_hasSave) DrawOption("CONTINUE", 176, _selection == 0);
-		DrawOption("START AGAIN", _hasSave ? 216 : 200, _selection == (_hasSave ? 1 : 0));
-		DrawOption("MAIN MENU", _hasSave ? 256 : 240, _selection == (_hasSave ? 2 : 1));
-		DrawText("green", "UP DOWN + FIRE", 304);
-	}
-
-	private void DrawOption(string text, int y, bool selected)
-	{
-		int x = (512 - text.Length * 16) / 2;
-		if (selected) DrawTextureRectRegion(GD.Load<Texture2D>("res://assets/images/egg.png"), new Rect2(x - 24, y, 16, 16), new Rect2(0, 0, 16, 16));
-		DrawText(selected ? "purple" : "cyan", text, y);
-	}
-
-	private void DrawText(string color, string text, int y)
-	{
-		Texture2D font = GD.Load<Texture2D>($"res://assets/images/font_{color}.png");
-		int columns = font.GetWidth() / 16;
-		int x = (512 - text.Length * 16) / 2;
-		foreach (char c in text)
-		{
-			int index = c - 32;
-			DrawTextureRectRegion(font, new Rect2(x, y, 16, 16), new Rect2(index % columns * 16, index / columns * 16, 16, 16));
-			x += 16;
-		}
 	}
 }
