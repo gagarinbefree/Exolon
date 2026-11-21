@@ -1,0 +1,877 @@
+[gd_scene format=4]
+
+[ext_resource type="Script" path="res://scripts/maps/map_data.gd" id="1_oeghp"]
+[ext_resource type="Texture2D" path="res://assets/images/tiles.png" id="2_txn4t"]
+[ext_resource type="Texture2D" path="res://assets/images/metatiles.png" id="3_31ljy"]
+[ext_resource type="Texture2D" path="res://assets/images/rocks.png" id="4_aewk3"]
+[ext_resource type="Script" path="res://scripts/maps/map_object.gd" id="5_dkgno"]
+[ext_resource type="Texture2D" path="res://assets/images/piston.png" id="6_2y0dv"]
+[ext_resource type="Texture2D" path="res://assets/images/vitorc.png" id="7_vtmhv"]
+[ext_resource type="Texture2D" path="res://assets/images/double_launcher.png" id="8_hfst8"]
+[ext_resource type="Texture2D" path="res://assets/images/teleport.png" id="9_ut3fj"]
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_07gcg"]
+texture = ExtResource("2_txn4t")
+0:0/0 = 0
+1:0/0 = 0
+2:0/0 = 0
+3:0/0 = 0
+4:0/0 = 0
+5:0/0 = 0
+6:0/0 = 0
+7:0/0 = 0
+8:0/0 = 0
+9:0/0 = 0
+10:0/0 = 0
+11:0/0 = 0
+12:0/0 = 0
+13:0/0 = 0
+14:0/0 = 0
+0:1/0 = 0
+1:1/0 = 0
+2:1/0 = 0
+3:1/0 = 0
+4:1/0 = 0
+5:1/0 = 0
+6:1/0 = 0
+7:1/0 = 0
+8:1/0 = 0
+9:1/0 = 0
+10:1/0 = 0
+11:1/0 = 0
+12:1/0 = 0
+13:1/0 = 0
+14:1/0 = 0
+0:2/0 = 0
+1:2/0 = 0
+2:2/0 = 0
+3:2/0 = 0
+4:2/0 = 0
+5:2/0 = 0
+6:2/0 = 0
+7:2/0 = 0
+8:2/0 = 0
+9:2/0 = 0
+10:2/0 = 0
+11:2/0 = 0
+12:2/0 = 0
+13:2/0 = 0
+14:2/0 = 0
+0:3/0 = 0
+1:3/0 = 0
+2:3/0 = 0
+3:3/0 = 0
+4:3/0 = 0
+5:3/0 = 0
+6:3/0 = 0
+7:3/0 = 0
+8:3/0 = 0
+9:3/0 = 0
+10:3/0 = 0
+11:3/0 = 0
+12:3/0 = 0
+13:3/0 = 0
+14:3/0 = 0
+0:4/0 = 0
+1:4/0 = 0
+2:4/0 = 0
+3:4/0 = 0
+4:4/0 = 0
+5:4/0 = 0
+6:4/0 = 0
+7:4/0 = 0
+8:4/0 = 0
+9:4/0 = 0
+10:4/0 = 0
+11:4/0 = 0
+12:4/0 = 0
+13:4/0 = 0
+14:4/0 = 0
+0:5/0 = 0
+1:5/0 = 0
+2:5/0 = 0
+3:5/0 = 0
+4:5/0 = 0
+5:5/0 = 0
+6:5/0 = 0
+7:5/0 = 0
+8:5/0 = 0
+9:5/0 = 0
+10:5/0 = 0
+11:5/0 = 0
+12:5/0 = 0
+13:5/0 = 0
+14:5/0 = 0
+0:6/0 = 0
+1:6/0 = 0
+2:6/0 = 0
+3:6/0 = 0
+4:6/0 = 0
+5:6/0 = 0
+6:6/0 = 0
+7:6/0 = 0
+8:6/0 = 0
+9:6/0 = 0
+10:6/0 = 0
+11:6/0 = 0
+12:6/0 = 0
+13:6/0 = 0
+14:6/0 = 0
+0:7/0 = 0
+1:7/0 = 0
+2:7/0 = 0
+3:7/0 = 0
+4:7/0 = 0
+5:7/0 = 0
+6:7/0 = 0
+7:7/0 = 0
+8:7/0 = 0
+9:7/0 = 0
+10:7/0 = 0
+11:7/0 = 0
+12:7/0 = 0
+13:7/0 = 0
+14:7/0 = 0
+0:8/0 = 0
+1:8/0 = 0
+2:8/0 = 0
+3:8/0 = 0
+4:8/0 = 0
+5:8/0 = 0
+6:8/0 = 0
+7:8/0 = 0
+8:8/0 = 0
+9:8/0 = 0
+10:8/0 = 0
+11:8/0 = 0
+12:8/0 = 0
+13:8/0 = 0
+14:8/0 = 0
+0:9/0 = 0
+1:9/0 = 0
+2:9/0 = 0
+3:9/0 = 0
+4:9/0 = 0
+5:9/0 = 0
+6:9/0 = 0
+7:9/0 = 0
+8:9/0 = 0
+9:9/0 = 0
+10:9/0 = 0
+11:9/0 = 0
+12:9/0 = 0
+13:9/0 = 0
+14:9/0 = 0
+0:10/0 = 0
+1:10/0 = 0
+2:10/0 = 0
+3:10/0 = 0
+4:10/0 = 0
+5:10/0 = 0
+6:10/0 = 0
+7:10/0 = 0
+8:10/0 = 0
+9:10/0 = 0
+10:10/0 = 0
+11:10/0 = 0
+12:10/0 = 0
+13:10/0 = 0
+14:10/0 = 0
+0:11/0 = 0
+1:11/0 = 0
+2:11/0 = 0
+3:11/0 = 0
+4:11/0 = 0
+5:11/0 = 0
+6:11/0 = 0
+7:11/0 = 0
+8:11/0 = 0
+9:11/0 = 0
+10:11/0 = 0
+11:11/0 = 0
+12:11/0 = 0
+13:11/0 = 0
+14:11/0 = 0
+0:12/0 = 0
+1:12/0 = 0
+2:12/0 = 0
+3:12/0 = 0
+4:12/0 = 0
+5:12/0 = 0
+6:12/0 = 0
+7:12/0 = 0
+8:12/0 = 0
+9:12/0 = 0
+10:12/0 = 0
+11:12/0 = 0
+12:12/0 = 0
+13:12/0 = 0
+14:12/0 = 0
+0:13/0 = 0
+1:13/0 = 0
+2:13/0 = 0
+3:13/0 = 0
+4:13/0 = 0
+5:13/0 = 0
+6:13/0 = 0
+7:13/0 = 0
+8:13/0 = 0
+9:13/0 = 0
+10:13/0 = 0
+11:13/0 = 0
+12:13/0 = 0
+13:13/0 = 0
+14:13/0 = 0
+0:14/0 = 0
+1:14/0 = 0
+2:14/0 = 0
+3:14/0 = 0
+4:14/0 = 0
+5:14/0 = 0
+6:14/0 = 0
+7:14/0 = 0
+8:14/0 = 0
+9:14/0 = 0
+10:14/0 = 0
+11:14/0 = 0
+12:14/0 = 0
+13:14/0 = 0
+14:14/0 = 0
+0:15/0 = 0
+1:15/0 = 0
+2:15/0 = 0
+3:15/0 = 0
+4:15/0 = 0
+5:15/0 = 0
+6:15/0 = 0
+7:15/0 = 0
+8:15/0 = 0
+9:15/0 = 0
+10:15/0 = 0
+11:15/0 = 0
+12:15/0 = 0
+13:15/0 = 0
+14:15/0 = 0
+0:16/0 = 0
+1:16/0 = 0
+2:16/0 = 0
+3:16/0 = 0
+4:16/0 = 0
+5:16/0 = 0
+6:16/0 = 0
+7:16/0 = 0
+8:16/0 = 0
+9:16/0 = 0
+10:16/0 = 0
+11:16/0 = 0
+12:16/0 = 0
+13:16/0 = 0
+14:16/0 = 0
+0:17/0 = 0
+1:17/0 = 0
+2:17/0 = 0
+3:17/0 = 0
+4:17/0 = 0
+5:17/0 = 0
+6:17/0 = 0
+7:17/0 = 0
+8:17/0 = 0
+9:17/0 = 0
+10:17/0 = 0
+11:17/0 = 0
+12:17/0 = 0
+13:17/0 = 0
+14:17/0 = 0
+0:18/0 = 0
+1:18/0 = 0
+2:18/0 = 0
+3:18/0 = 0
+4:18/0 = 0
+5:18/0 = 0
+6:18/0 = 0
+7:18/0 = 0
+8:18/0 = 0
+9:18/0 = 0
+10:18/0 = 0
+11:18/0 = 0
+12:18/0 = 0
+13:18/0 = 0
+14:18/0 = 0
+0:19/0 = 0
+1:19/0 = 0
+2:19/0 = 0
+3:19/0 = 0
+4:19/0 = 0
+5:19/0 = 0
+6:19/0 = 0
+7:19/0 = 0
+8:19/0 = 0
+9:19/0 = 0
+10:19/0 = 0
+11:19/0 = 0
+12:19/0 = 0
+13:19/0 = 0
+14:19/0 = 0
+0:20/0 = 0
+1:20/0 = 0
+2:20/0 = 0
+3:20/0 = 0
+4:20/0 = 0
+5:20/0 = 0
+6:20/0 = 0
+7:20/0 = 0
+8:20/0 = 0
+9:20/0 = 0
+10:20/0 = 0
+11:20/0 = 0
+12:20/0 = 0
+13:20/0 = 0
+14:20/0 = 0
+0:21/0 = 0
+1:21/0 = 0
+2:21/0 = 0
+3:21/0 = 0
+4:21/0 = 0
+5:21/0 = 0
+6:21/0 = 0
+7:21/0 = 0
+8:21/0 = 0
+9:21/0 = 0
+10:21/0 = 0
+11:21/0 = 0
+12:21/0 = 0
+13:21/0 = 0
+14:21/0 = 0
+0:22/0 = 0
+1:22/0 = 0
+2:22/0 = 0
+3:22/0 = 0
+4:22/0 = 0
+5:22/0 = 0
+6:22/0 = 0
+7:22/0 = 0
+8:22/0 = 0
+9:22/0 = 0
+10:22/0 = 0
+11:22/0 = 0
+12:22/0 = 0
+13:22/0 = 0
+14:22/0 = 0
+0:23/0 = 0
+1:23/0 = 0
+2:23/0 = 0
+3:23/0 = 0
+4:23/0 = 0
+5:23/0 = 0
+6:23/0 = 0
+7:23/0 = 0
+8:23/0 = 0
+9:23/0 = 0
+10:23/0 = 0
+11:23/0 = 0
+12:23/0 = 0
+13:23/0 = 0
+14:23/0 = 0
+0:24/0 = 0
+1:24/0 = 0
+2:24/0 = 0
+3:24/0 = 0
+4:24/0 = 0
+5:24/0 = 0
+6:24/0 = 0
+7:24/0 = 0
+8:24/0 = 0
+9:24/0 = 0
+10:24/0 = 0
+11:24/0 = 0
+12:24/0 = 0
+13:24/0 = 0
+14:24/0 = 0
+0:25/0 = 0
+1:25/0 = 0
+2:25/0 = 0
+3:25/0 = 0
+4:25/0 = 0
+5:25/0 = 0
+6:25/0 = 0
+7:25/0 = 0
+8:25/0 = 0
+9:25/0 = 0
+10:25/0 = 0
+11:25/0 = 0
+12:25/0 = 0
+13:25/0 = 0
+14:25/0 = 0
+0:26/0 = 0
+1:26/0 = 0
+2:26/0 = 0
+3:26/0 = 0
+4:26/0 = 0
+5:26/0 = 0
+6:26/0 = 0
+7:26/0 = 0
+8:26/0 = 0
+9:26/0 = 0
+10:26/0 = 0
+11:26/0 = 0
+12:26/0 = 0
+13:26/0 = 0
+14:26/0 = 0
+0:27/0 = 0
+1:27/0 = 0
+2:27/0 = 0
+3:27/0 = 0
+4:27/0 = 0
+5:27/0 = 0
+6:27/0 = 0
+7:27/0 = 0
+8:27/0 = 0
+9:27/0 = 0
+10:27/0 = 0
+11:27/0 = 0
+12:27/0 = 0
+13:27/0 = 0
+14:27/0 = 0
+0:28/0 = 0
+1:28/0 = 0
+2:28/0 = 0
+3:28/0 = 0
+4:28/0 = 0
+5:28/0 = 0
+6:28/0 = 0
+7:28/0 = 0
+8:28/0 = 0
+9:28/0 = 0
+10:28/0 = 0
+11:28/0 = 0
+12:28/0 = 0
+13:28/0 = 0
+14:28/0 = 0
+0:29/0 = 0
+1:29/0 = 0
+2:29/0 = 0
+3:29/0 = 0
+4:29/0 = 0
+5:29/0 = 0
+6:29/0 = 0
+7:29/0 = 0
+8:29/0 = 0
+9:29/0 = 0
+10:29/0 = 0
+11:29/0 = 0
+12:29/0 = 0
+13:29/0 = 0
+14:29/0 = 0
+0:30/0 = 0
+1:30/0 = 0
+2:30/0 = 0
+3:30/0 = 0
+4:30/0 = 0
+5:30/0 = 0
+6:30/0 = 0
+7:30/0 = 0
+8:30/0 = 0
+9:30/0 = 0
+10:30/0 = 0
+11:30/0 = 0
+12:30/0 = 0
+13:30/0 = 0
+14:30/0 = 0
+0:31/0 = 0
+1:31/0 = 0
+2:31/0 = 0
+3:31/0 = 0
+4:31/0 = 0
+5:31/0 = 0
+6:31/0 = 0
+7:31/0 = 0
+8:31/0 = 0
+9:31/0 = 0
+10:31/0 = 0
+11:31/0 = 0
+12:31/0 = 0
+13:31/0 = 0
+14:31/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_jclt2"]
+texture = ExtResource("3_31ljy")
+0:0/0 = 0
+1:0/0 = 0
+2:0/0 = 0
+3:0/0 = 0
+4:0/0 = 0
+5:0/0 = 0
+6:0/0 = 0
+7:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_54imy"]
+texture = ExtResource("4_aewk3")
+0:0/0 = 0
+1:0/0 = 0
+2:0/0 = 0
+3:0/0 = 0
+4:0/0 = 0
+5:0/0 = 0
+6:0/0 = 0
+7:0/0 = 0
+8:0/0 = 0
+9:0/0 = 0
+10:0/0 = 0
+11:0/0 = 0
+12:0/0 = 0
+13:0/0 = 0
+14:0/0 = 0
+15:0/0 = 0
+16:0/0 = 0
+17:0/0 = 0
+18:0/0 = 0
+19:0/0 = 0
+20:0/0 = 0
+21:0/0 = 0
+22:0/0 = 0
+23:0/0 = 0
+24:0/0 = 0
+25:0/0 = 0
+26:0/0 = 0
+27:0/0 = 0
+28:0/0 = 0
+29:0/0 = 0
+30:0/0 = 0
+31:0/0 = 0
+0:1/0 = 0
+1:1/0 = 0
+2:1/0 = 0
+3:1/0 = 0
+4:1/0 = 0
+5:1/0 = 0
+6:1/0 = 0
+7:1/0 = 0
+8:1/0 = 0
+9:1/0 = 0
+10:1/0 = 0
+11:1/0 = 0
+12:1/0 = 0
+13:1/0 = 0
+14:1/0 = 0
+15:1/0 = 0
+16:1/0 = 0
+17:1/0 = 0
+18:1/0 = 0
+19:1/0 = 0
+20:1/0 = 0
+21:1/0 = 0
+22:1/0 = 0
+23:1/0 = 0
+24:1/0 = 0
+25:1/0 = 0
+26:1/0 = 0
+27:1/0 = 0
+28:1/0 = 0
+29:1/0 = 0
+30:1/0 = 0
+31:1/0 = 0
+0:2/0 = 0
+1:2/0 = 0
+2:2/0 = 0
+3:2/0 = 0
+4:2/0 = 0
+5:2/0 = 0
+6:2/0 = 0
+7:2/0 = 0
+8:2/0 = 0
+9:2/0 = 0
+10:2/0 = 0
+11:2/0 = 0
+12:2/0 = 0
+13:2/0 = 0
+14:2/0 = 0
+15:2/0 = 0
+16:2/0 = 0
+17:2/0 = 0
+18:2/0 = 0
+19:2/0 = 0
+20:2/0 = 0
+21:2/0 = 0
+22:2/0 = 0
+23:2/0 = 0
+24:2/0 = 0
+25:2/0 = 0
+26:2/0 = 0
+27:2/0 = 0
+28:2/0 = 0
+29:2/0 = 0
+30:2/0 = 0
+31:2/0 = 0
+
+[sub_resource type="TileSet" id="TileSet_avhgt"]
+sources/1 = SubResource("TileSetAtlasSource_07gcg")
+sources/561 = SubResource("TileSetAtlasSource_54imy")
+sources/481 = SubResource("TileSetAtlasSource_jclt2")
+
+[node name="L01S15" type="Node2D" unique_id=2091059642]
+script = ExtResource("1_oeghp")
+next_level = "L01S16"
+tilesets = Array[Dictionary]([{
+"firstgid": 1.0,
+"height": 16.0,
+"image_height": 512.0,
+"image_width": 240.0,
+"name": "tiles",
+"width": 16.0
+}, {
+"firstgid": 481.0,
+"height": 16.0,
+"image_height": 16.0,
+"image_width": 128.0,
+"name": "metatiles",
+"width": 16.0
+}, {
+"firstgid": 489.0,
+"height": 128.0,
+"image_height": 128.0,
+"image_width": 176.0,
+"name": "ship",
+"width": 176.0
+}, {
+"firstgid": 490.0,
+"height": 32.0,
+"image_height": 128.0,
+"image_width": 48.0,
+"name": "ship_fire",
+"width": 16.0
+}, {
+"firstgid": 502.0,
+"height": 16.0,
+"image_height": 32.0,
+"image_width": 128.0,
+"name": "light",
+"width": 16.0
+}, {
+"firstgid": 518.0,
+"height": 64.0,
+"image_height": 64.0,
+"image_width": 528.0,
+"name": "vitorc",
+"width": 48.0
+}, {
+"firstgid": 529.0,
+"height": 80.0,
+"image_height": 80.0,
+"image_width": 96.0,
+"name": "turret",
+"width": 96.0
+}, {
+"firstgid": 530.0,
+"height": 128.0,
+"image_height": 128.0,
+"image_width": 80.0,
+"name": "cocoon",
+"width": 80.0
+}, {
+"firstgid": 531.0,
+"height": 128.0,
+"image_height": 128.0,
+"image_width": 80.0,
+"name": "radar",
+"width": 80.0
+}, {
+"firstgid": 532.0,
+"height": 96.0,
+"image_height": 96.0,
+"image_width": 64.0,
+"name": "rocket",
+"width": 64.0
+}, {
+"firstgid": 533.0,
+"height": 32.0,
+"image_height": 32.0,
+"image_width": 32.0,
+"name": "grenade_pack",
+"width": 32.0
+}, {
+"firstgid": 534.0,
+"height": 96.0,
+"image_height": 96.0,
+"image_width": 512.0,
+"name": "teleport",
+"width": 64.0
+}, {
+"firstgid": 542.0,
+"height": 64.0,
+"image_height": 64.0,
+"image_width": 48.0,
+"name": "piston",
+"width": 48.0
+}, {
+"firstgid": 543.0,
+"height": 32.0,
+"image_height": 192.0,
+"image_width": 96.0,
+"name": "bubble",
+"width": 32.0
+}, {
+"firstgid": 561.0,
+"height": 16.0,
+"image_height": 48.0,
+"image_width": 512.0,
+"name": "rocks",
+"width": 16.0
+}, {
+"firstgid": 657.0,
+"height": 96.0,
+"image_height": 96.0,
+"image_width": 64.0,
+"name": "incubator",
+"width": 64.0
+}, {
+"firstgid": 658.0,
+"height": 32.0,
+"image_height": 32.0,
+"image_width": 32.0,
+"name": "ammo_pack",
+"width": 32.0
+}, {
+"firstgid": 659.0,
+"height": 48.0,
+"image_height": 48.0,
+"image_width": 64.0,
+"name": "double_launcher",
+"width": 64.0
+}, {
+"firstgid": 660.0,
+"height": 16.0,
+"image_height": 16.0,
+"image_width": 32.0,
+"name": "mine",
+"width": 32.0
+}, {
+"firstgid": 661.0,
+"height": 64.0,
+"image_height": 64.0,
+"image_width": 64.0,
+"name": "missile_guidance",
+"width": 64.0
+}, {
+"firstgid": 662.0,
+"height": 16.0,
+"image_height": 144.0,
+"image_width": 176.0,
+"name": "gate",
+"width": 16.0
+}, {
+"firstgid": 761.0,
+"height": 32.0,
+"image_height": 192.0,
+"image_width": 96.0,
+"name": "interceptor",
+"width": 32.0
+}])
+
+[node name="00_Stars" type="TileMapLayer" parent="." unique_id=694933921]
+tile_set = SubResource("TileSet_avhgt")
+collision_enabled = false
+metadata/map_layer_name = "Stars"
+metadata/map_layer_kind = "layer"
+
+[node name="01_Object Layer 3" type="Node2D" parent="." unique_id=1803165089]
+z_index = 128
+metadata/map_layer_name = "Object Layer 3"
+metadata/map_layer_kind = "objectgroup"
+
+[node name="000_piston" type="Node2D" parent="01_Object Layer 3" unique_id=1713690609]
+z_index = 127
+position = Vector2(128, 320)
+script = ExtResource("5_dkgno")
+object_type = "piston"
+gid = 542
+preview_texture = ExtResource("6_2y0dv")
+preview_region = Rect2(0, 0, 48, 64)
+
+[node name="001_piston" type="Node2D" parent="01_Object Layer 3" unique_id=705997570]
+z_index = 126
+position = Vector2(352, 320)
+script = ExtResource("5_dkgno")
+object_type = "piston"
+gid = 542
+preview_texture = ExtResource("6_2y0dv")
+preview_region = Rect2(0, 0, 48, 64)
+
+[node name="002_piston" type="Node2D" parent="01_Object Layer 3" unique_id=1553702050]
+z_index = 125
+position = Vector2(240, 320)
+script = ExtResource("5_dkgno")
+object_type = "piston"
+gid = 542
+preview_texture = ExtResource("6_2y0dv")
+preview_region = Rect2(0, 0, 48, 64)
+
+[node name="02_Tile Layer 1" type="TileMapLayer" parent="." unique_id=930381399]
+z_index = 256
+tile_map_data = PackedByteArray("AAADAAAAAQAJAAMAAAAEAAAAAQAKAAMAAAAFAAAAAQALAAMAAAADAAEAAQAJAAQAAAAEAAEAAQAKAAQAAAAFAAEAAQALAAQAAAADAAIAAQAJAAUAAAAEAAIAAQAKAAUAAAAFAAIAAQALAAUAAAAAABYAAQAOAAAAAAABABYAAQAOAAAAAAACABYAAQAOAAAAAAADABYAAQAOAAAAAAAEABYAAQAOAAAAAAAFABYAAQAOAAAAAAAGABYAAQAOAAAAAAAHABYAAQAOAAAAAAAIABYAAQAOAAAAAAAJABYAAQAOAAAAAAAKABYAAQAOAAAAAAALABYAAQAOAAAAAAAMABYAAQAOAAAAAAANABYAAQAOAAAAAAAOABYAAQAOAAAAAAAPABYAAQAOAAAAAAAQABYAAQAOAAAAAAARABYAAQAOAAAAAAASABYAAQAOAAAAAAATABYAAQAOAAAAAAAUABYAAQAOAAAAAAAVABYAAQAOAAAAAAAWABYAAQAOAAAAAAAXABYAAQAOAAAAAAAYABYAAQAOAAAAAAAZABYAAQAOAAAAAAAaABYAAQAOAAAAAAAbABYAAQAOAAAAAAAcABYAAQAOAAAAAAAdABYAAQAOAAAAAAAeABYAAQAOAAAAAAAfABYAAQAOAAAAAAAAABcAAQAOAAAAAAABABcAAQAOAAAAAAACABcAAQAOAAAAAAADABcAAQAOAAAAAAAEABcAAQAOAAAAAAAFABcAAQAOAAAAAAAGABcAAQAOAAAAAAAHABcAAQAOAAAAAAAIABcAAQAOAAAAAAAJABcAAQAOAAAAAAAKABcAAQAOAAAAAAALABcAAQAOAAAAAAAMABcAAQAOAAAAAAANABcAAQAOAAAAAAAOABcAAQAOAAAAAAAPABcAAQAOAAAAAAAQABcAAQAOAAAAAAARABcAAQAOAAAAAAASABcAAQAOAAAAAAATABcAAQAOAAAAAAAUABcAAQAOAAAAAAAVABcAAQAOAAAAAAAWABcAAQAOAAAAAAAXABcAAQAOAAAAAAAYABcAAQAOAAAAAAAZABcAAQAOAAAAAAAaABcAAQAOAAAAAAAbABcAAQAOAAAAAAAcABcAAQAOAAAAAAAdABcAAQAOAAAAAAAeABcAAQAOAAAAAAAfABcAAQAOAAAAAAA=")
+tile_set = SubResource("TileSet_avhgt")
+collision_enabled = false
+metadata/map_layer_name = "Tile Layer 1"
+metadata/map_layer_kind = "layer"
+
+[node name="03_Object Layer 1" type="Node2D" parent="." unique_id=1221379896]
+z_index = 384
+metadata/map_layer_name = "Object Layer 1"
+metadata/map_layer_kind = "objectgroup"
+
+[node name="000_vitorc" type="Node2D" parent="03_Object Layer 1" unique_id=790251655]
+z_index = 127
+position = Vector2(0, 192)
+script = ExtResource("5_dkgno")
+object_type = "vitorc"
+gid = 518
+preview_texture = ExtResource("7_vtmhv")
+preview_region = Rect2(0, 0, 48, 64)
+
+[node name="04_Object Layer 2" type="Node2D" parent="." unique_id=458541055]
+z_index = 512
+metadata/map_layer_name = "Object Layer 2"
+metadata/map_layer_kind = "objectgroup"
+
+[node name="000_double_launcher" type="Node2D" parent="04_Object Layer 2" unique_id=114330683]
+z_index = 127
+position = Vector2(288, 192)
+script = ExtResource("5_dkgno")
+object_type = "double_launcher"
+gid = 659
+preview_texture = ExtResource("8_hfst8")
+preview_region = Rect2(0, 0, 64, 48)
+
+[node name="001_teleport" type="Node2D" parent="04_Object Layer 2" unique_id=390033963]
+z_index = 126
+position = Vector2(80, 192)
+script = ExtResource("5_dkgno")
+object_type = "teleport"
+gid = 534
+preview_texture = ExtResource("9_ut3fj")
+preview_region = Rect2(0, 0, 64, 96)
+
+[node name="002_teleport" type="Node2D" parent="04_Object Layer 2" unique_id=1760356470]
+z_index = 125
+position = Vector2(368, 192)
+script = ExtResource("5_dkgno")
+object_type = "teleport"
+gid = 534
+preview_texture = ExtResource("9_ut3fj")
+preview_region = Rect2(0, 0, 64, 96)
+
+[node name="05_Tile Layer 2" type="TileMapLayer" parent="." unique_id=1419686394]
+z_index = 640
+tile_map_data = PackedByteArray("AAAAAAwAMQIAAAAAAAABAAwAMQIBAAAAAAACAAwAMQICAAAAAAADAAwAMQIDAAAAAAAEAAwAMQIEAAAAAAAFAAwAMQIFAAAAAAAGAAwAMQIGAAAAAAAHAAwAMQIHAAAAAAAIAAwAMQIIAAAAAAAJAAwAMQIJAAAAAAAKAAwAMQIKAAAAAAALAAwAMQILAAAAAAAMAAwAMQIMAAAAAAANAAwAMQINAAAAAAAOAAwAMQIOAAAAAAAPAAwAMQIPAAAAAAAQAAwAMQIQAAAAAAARAAwAMQIRAAAAAAASAAwAMQISAAAAAAATAAwAMQITAAAAAAAUAAwAMQIUAAAAAAAVAAwAMQIVAAAAAAAWAAwAMQIWAAAAAAAXAAwAMQIXAAAAAAAYAAwAMQIYAAAAAAAZAAwAMQIZAAAAAAAaAAwAMQIaAAAAAAAbAAwAMQIbAAAAAAAcAAwAMQIcAAAAAAAdAAwAMQIdAAAAAAAeAAwAMQIeAAAAAAAfAAwAMQIfAAAAAAAAAA0AMQIAAAEAAAABAA0AMQIBAAEAAAACAA0AMQICAAEAAAADAA0AMQIDAAEAAAAEAA0AMQIEAAEAAAAFAA0AMQIFAAEAAAAGAA0AMQIGAAEAAAAHAA0AMQIHAAEAAAAIAA0AMQIIAAEAAAAJAA0AMQIJAAEAAAAKAA0AMQIKAAEAAAALAA0AMQILAAEAAAAMAA0AMQIMAAEAAAANAA0AMQINAAEAAAAOAA0AMQIOAAEAAAAPAA0AMQIPAAEAAAAQAA0AMQIQAAEAAAARAA0AMQIRAAEAAAASAA0AMQISAAEAAAATAA0AMQITAAEAAAAUAA0AMQIUAAEAAAAVAA0AMQIVAAEAAAAWAA0AMQIWAAEAAAAXAA0AMQIXAAEAAAAYAA0AMQIYAAEAAAAZAA0AMQIZAAEAAAAaAA0AMQIaAAEAAAAbAA0AMQIbAAEAAAAcAA0AMQIcAAEAAAAdAA0AMQIdAAEAAAAeAA0AMQIeAAEAAAAfAA0AMQIfAAEAAAAAAA4AAQAAAAAAAAABAA4AAQABAAAAAAACAA4AAQAAAAAAAAADAA4AAQABAAAAAAAEAA4AAQAAAAAAAAAFAA4AAQABAAAAAAAGAA4AAQAAAAAAAAAHAA4AAQABAAAAAAAIAA4AAQAAAAAAAAAJAA4AAQABAAAAAAAKAA4AAQAAAAAAAAALAA4AAQABAAAAAAAMAA4AAQAAAAAAAAANAA4AAQABAAAAAAAOAA4AAQAAAAAAAAAPAA4AAQABAAAAAAAQAA4AAQAAAAAAAAARAA4AAQABAAAAAAASAA4AAQAAAAAAAAATAA4AAQABAAAAAAAUAA4AAQAAAAAAAAAVAA4AAQABAAAAAAAWAA4AAQAAAAAAAAAXAA4AAQABAAAAAAAYAA4AAQAAAAAAAAAZAA4AAQABAAAAAAAaAA4AAQAAAAAAAAAbAA4AAQABAAAAAAAcAA4AAQAAAAAAAAAdAA4AAQABAAAAAAAeAA4AAQAAAAAAAAAfAA4AAQABAAAAAAAEAA8AAQAMAAYAAAAFAA8AAQANAAYAAAAGAA8AAQAOAAYAAAAaAA8AAQAMAAYAAAAbAA8AAQANAAYAAAAcAA8AAQAOAAYAAAAEABAAAQAMAAcAAAAFABAAAQANAAcAAAAGABAAAQAOAAcAAAAaABAAAQAMAAcAAAAbABAAAQANAAcAAAAcABAAAQAOAAcAAAAEABEAAQAMAAgAAAAFABEAAQANAAgAAAAGABEAAQAOAAgAAAAaABEAAQAMAAgAAAAbABEAAQANAAgAAAAcABEAAQAOAAgAAAAEABIAAQAMAAkAAAAFABIAAQANAAkAAAAGABIAAQAOAAkAAAAaABIAAQAMAAkAAAAbABIAAQANAAkAAAAcABIAAQAOAAkAAAAEABMAAQAMAAoAAAAFABMAAQANAAoAAAAGABMAAQAOAAoAAAAaABMAAQAMAAoAAAAbABMAAQANAAoAAAAcABMAAQAOAAoAAAAAABQAAQAHAAYAAAABABQAAQAIAAYAAAACABQAAQAJAAYAAAADABQAAQAKAAYAAAAEABQAAQALAAYAAAAFABQAAQAHAAYAAAAGABQAAQAJAAYAAAAHABQAAQAKAAYAAAAIABQAAQALAAYAAAAJABQAAQAHAAYAAAAKABQAAQAIAAYAAAALABQAAQAIAAYAAAAMABQAAQAJAAYAAAANABQAAQAKAAYAAAAOABQAAQALAAYAAAAPABQAAQAHAAYAAAAQABQAAQAIAAYAAAARABQAAQAJAAYAAAASABQAAQAKAAYAAAATABQAAQALAAYAAAAUABQAAQAHAAYAAAAVABQAAQAJAAYAAAAWABQAAQAHAAYAAAAXABQAAQAIAAYAAAAYABQAAQAJAAYAAAAZABQAAQAKAAYAAAAaABQAAQALAAYAAAAbABQAAQAKAAYAAAAcABQAAQALAAYAAAAdABQAAQAHAAYAAAAeABQAAQAIAAYAAAAfABQAAQAJAAYAAAAAABUAAQAHAAcAAAABABUAAQAIAAcAAAACABUAAQAJAAcAAAADABUAAQAKAAcAAAAEABUAAQALAAcAAAAFABUAAQAHAAcAAAAGABUAAQAJAAcAAAAHABUAAQAKAAcAAAAIABUAAQALAAcAAAAJABUAAQAHAAcAAAAKABUAAQAIAAcAAAALABUAAQAIAAcAAAAMABUAAQAJAAcAAAANABUAAQAKAAcAAAAOABUAAQALAAcAAAAPABUAAQAHAAcAAAAQABUAAQAIAAcAAAARABUAAQAJAAcAAAASABUAAQAKAAcAAAATABUAAQALAAcAAAAUABUAAQAHAAcAAAAVABUAAQAJAAcAAAAWABUAAQAHAAcAAAAXABUAAQAIAAcAAAAYABUAAQAJAAcAAAAZABUAAQAKAAcAAAAaABUAAQALAAcAAAAbABUAAQAKAAcAAAAcABUAAQALAAcAAAAdABUAAQAHAAcAAAAeABUAAQAIAAcAAAAfABUAAQAJAAcAAAA=")
+tile_set = SubResource("TileSet_avhgt")
+collision_enabled = false
+metadata/map_layer_name = "Tile Layer 2"
+metadata/map_layer_kind = "layer"
+
+[node name="06_Collision" type="TileMapLayer" parent="." unique_id=1982162914]
+visible = false
+z_index = 768
+tile_map_data = PackedByteArray("AAAAAAwA4QEAAAAAAAABAAwA4QEAAAAAAAACAAwA4QEAAAAAAAADAAwA4QEAAAAAAAAEAAwA4QEAAAAAAAAFAAwA4QEAAAAAAAAGAAwA4QEAAAAAAAAHAAwA4QEAAAAAAAAIAAwA4QEAAAAAAAAJAAwA4QEAAAAAAAAKAAwA4QEAAAAAAAALAAwA4QEAAAAAAAAMAAwA4QEAAAAAAAANAAwA4QEAAAAAAAAOAAwA4QEAAAAAAAAPAAwA4QEAAAAAAAAQAAwA4QEAAAAAAAARAAwA4QEAAAAAAAASAAwA4QEAAAAAAAATAAwA4QEAAAAAAAAUAAwA4QEAAAAAAAAVAAwA4QEAAAAAAAAWAAwA4QEAAAAAAAAXAAwA4QEAAAAAAAAYAAwA4QEAAAAAAAAZAAwA4QEAAAAAAAAaAAwA4QEAAAAAAAAbAAwA4QEAAAAAAAAcAAwA4QEAAAAAAAAdAAwA4QEAAAAAAAAeAAwA4QEAAAAAAAAfAAwA4QEAAAAAAAAAAA4A4QEAAAAAAAABAA4A4QEAAAAAAAACAA4A4QEAAAAAAAADAA4A4QEAAAAAAAAEAA4A4QEAAAAAAAAFAA4A4QEAAAAAAAAGAA4A4QEAAAAAAAAHAA4A4QEAAAAAAAAIAA4A4QEAAAAAAAAJAA4A4QEAAAAAAAAKAA4A4QEAAAAAAAALAA4A4QEAAAAAAAAMAA4A4QEAAAAAAAANAA4A4QEAAAAAAAAOAA4A4QEAAAAAAAAPAA4A4QEAAAAAAAAQAA4A4QEAAAAAAAARAA4A4QEAAAAAAAASAA4A4QEAAAAAAAATAA4A4QEAAAAAAAAUAA4A4QEAAAAAAAAVAA4A4QEAAAAAAAAWAA4A4QEAAAAAAAAXAA4A4QEAAAAAAAAYAA4A4QEAAAAAAAAZAA4A4QEAAAAAAAAaAA4A4QEAAAAAAAAbAA4A4QEAAAAAAAAcAA4A4QEAAAAAAAAdAA4A4QEAAAAAAAAeAA4A4QEAAAAAAAAfAA4A4QEAAAAAAAAAABQA4QEAAAAAAAABABQA4QEAAAAAAAACABQA4QEAAAAAAAADABQA4QEAAAAAAAAEABQA4QEAAAAAAAAFABQA4QEAAAAAAAAGABQA4QEAAAAAAAAHABQA4QEAAAAAAAAIABQA4QEAAAAAAAAJABQA4QEAAAAAAAAKABQA4QEAAAAAAAALABQA4QEAAAAAAAAMABQA4QEAAAAAAAANABQA4QEAAAAAAAAOABQA4QEAAAAAAAAPABQA4QEAAAAAAAAQABQA4QEAAAAAAAARABQA4QEAAAAAAAASABQA4QEAAAAAAAATABQA4QEAAAAAAAAUABQA4QEAAAAAAAAVABQA4QEAAAAAAAAWABQA4QEAAAAAAAAXABQA4QEAAAAAAAAYABQA4QEAAAAAAAAZABQA4QEAAAAAAAAaABQA4QEAAAAAAAAbABQA4QEAAAAAAAAcABQA4QEAAAAAAAAdABQA4QEAAAAAAAAeABQA4QEAAAAAAAAfABQA4QEAAAAAAAA=")
+tile_set = SubResource("TileSet_avhgt")
+collision_enabled = false
+metadata/map_layer_name = "Collision"
+metadata/map_layer_kind = "layer"

@@ -28,7 +28,10 @@ func run_check():
 	if world.TestZone() != 75 or world.TestNextLevel() != "L01S02": return fail("Final bonus did not return to first map")
 	print("PASS: final completion, bonus and return to L01S01")
 	world.queue_free()
-	await process_frame
+	await frames(10)
+	# Stopping an AudioStreamPlayer releases its playback on the audio mixer thread.
+	# The fixed-FPS headless runner can otherwise exit before that thread drains.
+	OS.delay_msec(300)
 	quit(0)
 
 func fail(message: String):

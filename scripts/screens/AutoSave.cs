@@ -58,11 +58,12 @@ public static class AutoSave
 			int points = file.GetValue("checkpoint", "points", -1).AsInt32();
 			bool armored = file.GetValue("checkpoint", "armored", false).AsBool();
 			float y = file.GetValue("checkpoint", "y", -1).AsSingle();
-			if (!LevelMap.CanEnter(level) || !LevelMap.Exists(level) || zone < 0 || zone > 74 ||
+			if (!LevelMap.CanEnter(level) || !LevelMap.Exists(level) || zone < 0 ||
 				ammo < 0 || ammo > 99 || grenades < 0 || grenades > 10 || lives < 1 || lives > 9 ||
 				points < 0 || !float.IsFinite(y) || y < 0 || y > 384) return null;
 			int expectedZone = (int.Parse(level.AsSpan(1, 2)) - 1) * 25 + int.Parse(level.AsSpan(4, 2)) - 1;
-			return zone == expectedZone ? new Checkpoint(level, zone, ammo, grenades, lives, points, armored, y) : null;
+			// Zone counts keep increasing when the game loops after L03S25.
+			return zone % 75 == expectedZone ? new Checkpoint(level, zone, ammo, grenades, lives, points, armored, y) : null;
 		}
 		catch (Exception error) when (error is InvalidCastException or FormatException or OverflowException)
 		{
