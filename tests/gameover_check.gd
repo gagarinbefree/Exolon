@@ -14,7 +14,8 @@ func run_check():
 		player.GrantInvulnerability(0.0)
 		await physics_frame
 		await physics_frame
-		if not player.Kill():
+		# The turret can land the fatal hit as soon as respawn protection expires.
+		if not player.IsDead and not player.Kill():
 			push_error("Could not trigger death " + str(death + 1))
 			quit(1)
 			return

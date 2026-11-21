@@ -4,6 +4,7 @@ func _initialize():
 	call_deferred("check_previews")
 
 func check_previews():
+	var cleanup = preload("res://tests/support/ManagedResourceCleanup.cs").new()
 	for level in range(1, 4):
 		for screen in range(1, 26):
 			var name := "L%02dS%02d" % [level, screen]
@@ -21,5 +22,13 @@ func check_previews():
 				return
 			zone.queue_free()
 			await process_frame
-	print("PASS: all 75 zone scenes load their TMX maps")
+			if is_instance_valid(zone):
+				push_error("Preview scene was not freed: " + name)
+				quit(1)
+				return
+		# Scene nodes are gone, but their .NET resource wrappers can outlive the
+		# entire accelerated run. Drain their deferred releases on the main thread.
+		cleanup.CollectReleasedResources()
+		await process_frame
+	print("PASS: all 75 zone previews load and release their scenes")
 	quit(0)
